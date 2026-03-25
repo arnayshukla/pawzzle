@@ -6,13 +6,16 @@ export default function AdminPage() {
     <div className="min-h-screen bg-zinc-50 p-4 sm:p-8 font-sans dark:bg-zinc-950">
       <div className="mx-auto max-w-4xl space-y-8">
         <header className="flex items-center justify-between rounded-3xl bg-white p-6 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-              Admin Dashboard
-            </h1>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-              Upload and manage dog photos for the puzzle game.
-            </p>
+          <div className="flex items-center gap-4">
+            <img src="/logo.png" alt="Pawzzle Logo" className="w-10 h-10 rounded-xl hidden sm:block" />
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+                Admin Dashboard
+              </h1>
+              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                Upload and manage dog photos for the puzzle game.
+              </p>
+            </div>
           </div>
           <form action="/api/admin/logout" method="POST">
             <button

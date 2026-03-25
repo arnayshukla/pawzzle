@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Pawzzle | Dog Photo Puzzle",
   description: "A fun weekend swap-tile puzzle game featuring dog photos.",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 import { Analytics } from "@vercel/analytics/react";

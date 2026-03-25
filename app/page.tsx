@@ -54,7 +54,8 @@ export default function GamePage() {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black font-sans flex flex-col pt-12 p-4 sm:p-8">
-      <h1 className="text-center text-4xl font-black tracking-tighter text-zinc-900 dark:text-white mb-8 select-none">
+      <h1 className="flex items-center justify-center gap-4 text-center text-4xl font-black tracking-tighter text-zinc-900 dark:text-white mb-8 select-none">
+        <img src="/logo.png" alt="Pawzzle Logo" className="w-12 h-12 rounded-xl" />
         Pawzzle.
       </h1>
 
