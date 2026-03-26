@@ -12,6 +12,7 @@ export function ImageGallery() {
   const [images, setImages] = useState<R2Image[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
@@ -19,7 +20,8 @@ export function ImageGallery() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/images");
+      // no-store prevents aggressive browser caching
+      const res = await fetch("/api/admin/images", { cache: 'no-store' });
       if (!res.ok) throw new Error("Failed to fetch images");
       const data = await res.json();
       setImages(data);
@@ -45,25 +47,30 @@ export function ImageGallery() {
     setSelectedKeys(newPaths);
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (selectedKeys.size === 0) return;
-    
-    // Ask for a confirmation before deleting
-    const confirmed = window.confirm(`Are you sure you want to completely delete ${selectedKeys.size} photo(s)?\nThis action cannot be undone.`);
-    if (!confirmed) return;
+    setShowConfirm(true);
+  };
 
+  const confirmDelete = async () => {
     setDeleting(true);
     try {
+      const keysToDelete = Array.from(selectedKeys);
       const res = await fetch("/api/admin/images", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ keys: Array.from(selectedKeys) }),
+        body: JSON.stringify({ keys: keysToDelete }),
       });
 
       if (!res.ok) throw new Error("Failed to delete images");
       
+      // Optimistically remove images from the UI to avoid broken image links
+      setImages(prev => prev.filter(img => !keysToDelete.includes(img.key)));
       setSelectedKeys(new Set());
-      await fetchImages(); // refresh list
+      setShowConfirm(false);
+      
+      // Fetch full list in the background
+      fetchImages(); 
     } catch (err: any) {
       alert("Error: " + err.message);
     } finally {
@@ -167,6 +174,39 @@ export function ImageGallery() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="w-full max-w-sm rounded-[2rem] bg-white dark:bg-zinc-900 p-8 shadow-2xl ring-1 ring-black/5 dark:ring-white/10 text-center animate-in fade-in zoom-in duration-200">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+              <AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-500" />
+            </div>
+            <h2 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-2">
+              Delete Photos?
+            </h2>
+            <p className="text-zinc-500 dark:text-zinc-400 mb-8 font-medium">
+              Are you sure you want to permanently delete {selectedKeys.size} photo(s)? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="flex-1 rounded-2xl bg-zinc-100 px-4 py-3 text-sm font-bold text-zinc-900 transition-all hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700"
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="flex-1 flex items-center justify-center gap-2 rounded-2xl bg-red-600 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-red-700 disabled:opacity-50 shadow-md"
+                disabled={deleting}
+              >
+                {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

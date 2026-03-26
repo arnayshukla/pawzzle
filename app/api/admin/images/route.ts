@@ -1,11 +1,23 @@
 import { NextResponse } from 'next/server';
-import { getCachedImageKeys, r2Client, bucketName } from '@/lib/r2';
-import { GetObjectCommand, DeleteObjectsCommand } from '@aws-sdk/client-s3';
+import { r2Client, bucketName } from '@/lib/r2';
+import { GetObjectCommand, DeleteObjectsCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const keys = await getCachedImageKeys();
+    if (!bucketName) {
+      return NextResponse.json({ error: 'R2 bucket not configured' }, { status: 500 });
+    }
+
+    // Always fetch a perfectly fresh list for the admin interface (bypassing Next cache)
+    const listCommand = new ListObjectsV2Command({
+      Bucket: bucketName,
+      Prefix: "images/",
+    });
+    const listRes = await r2Client.send(listCommand);
+    const keys = listRes.Contents?.map(c => c.Key!).filter(Boolean) || [];
     
     // Generate presigned URLs for all images
     const images = await Promise.all(
