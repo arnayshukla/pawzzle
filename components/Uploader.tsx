@@ -83,7 +83,7 @@ export function Uploader() {
       setFiles([]);
       setStatus("success");
       setMessage(`Successfully uploaded ${files.length} image(s)!`);
-      
+
       // Dispatch custom event to notify ImageGallery
       window.dispatchEvent(new CustomEvent("photos-updated"));
     } catch (error) {
@@ -193,7 +193,7 @@ export function Uploader() {
           disabled={files.length === 0 || isUploading}
           className="flex items-center justify-center gap-2 rounded-xl bg-black px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black disabled:opacity-50 disabled:cursor-not-allowed dark:bg-white dark:text-black dark:hover:bg-zinc-200"
         >
-          {isUploading ? "Uploading..." : "Upload Files"}
+          {isUploading ? "Uploading..." : "Upload Images"}
         </button>
       </div>
     </div>

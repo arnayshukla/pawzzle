@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Trophy, RefreshCcw, Image as ImageIcon } from "lucide-react";
+import { Trophy, RefreshCcw, Image as ImageIcon, ZoomIn, X } from "lucide-react";
 import { Difficulty } from "@/hooks/usePuzzleState";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -10,6 +10,7 @@ interface WinModalProps {
   moves: number;
   time: number;
   difficulty: Difficulty;
+  imageUrl: string;
   onPlayAgain: () => void;
   onNewImage: () => void;
 }
@@ -19,9 +20,11 @@ export function WinModal({
   moves,
   time,
   difficulty,
+  imageUrl,
   onPlayAgain,
   onNewImage,
 }: WinModalProps) {
+  const [enlarged, setEnlarged] = useState(false);
   const [bestMoves, setBestMoves] = useState<number | null>(null);
   const [bestTime, setBestTime] = useState<number | null>(null);
   const [isNewHighScore, setIsNewHighScore] = useState(false);
@@ -57,13 +60,13 @@ export function WinModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/40 backdrop-blur-md p-4">
+      <div className="fixed inset-0 z-[100] flex items-center items-stretch sm:items-center justify-center bg-zinc-950/40 backdrop-blur-md p-4 sm:p-6 overflow-y-auto">
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 30 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 30 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="w-full max-w-sm rounded-[2rem] bg-white dark:bg-zinc-900 p-8 shadow-2xl ring-1 ring-black/5 dark:ring-white/10 text-center relative overflow-hidden"
+          className="w-full max-w-sm my-auto rounded-[2rem] bg-white dark:bg-zinc-900 p-6 sm:p-8 shadow-2xl ring-1 ring-black/5 dark:ring-white/10 text-center relative overflow-hidden"
         >
           {isNewHighScore && (
             <div className="absolute top-0 left-0 w-full bg-[#FFE500] text-amber-900 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest shadow-sm">
@@ -78,11 +81,22 @@ export function WinModal({
           <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-2">
             Pawfect!
           </h2>
-          <p className="text-zinc-500 dark:text-zinc-400 mb-8 font-medium">
+          <p className="text-zinc-500 dark:text-zinc-400 mb-6 font-medium">
             You solved the {difficulty} puzzle.
           </p>
 
-          <div className="grid grid-cols-2 gap-4 mb-8">
+          <div
+            className="w-full h-32 sm:h-40 rounded-xl overflow-hidden mb-6 cursor-zoom-in ring-1 ring-black/10 dark:ring-white/10 group relative bg-zinc-100 dark:bg-zinc-800 flex-shrink-0"
+            onClick={() => setEnlarged(true)}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={imageUrl} alt="Solved puzzle" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center transition-colors duration-300">
+               <ZoomIn className="text-white opacity-0 group-hover:opacity-100 drop-shadow-lg w-8 h-8 transition-opacity duration-300 scale-75 group-hover:scale-100" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mb-6 sm:mb-8">
             <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-5 ring-1 ring-zinc-100 dark:ring-zinc-800">
               <p className="text-xs uppercase tracking-wider font-bold text-zinc-400 dark:text-zinc-500 mb-1">Time</p>
               <p className="text-3xl font-mono font-bold text-zinc-900 dark:text-zinc-50">{time}s</p>
@@ -116,6 +130,34 @@ export function WinModal({
             </button>
           </div>
         </motion.div>
+
+        {/* Enlarged Image Overlay */}
+        <AnimatePresence>
+          {enlarged && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[110] flex items-center justify-center bg-black/95 p-2 sm:p-8 cursor-zoom-out"
+              onClick={() => setEnlarged(false)}
+            >
+              <button 
+                className="absolute top-4 right-4 sm:top-8 sm:right-8 bg-white/10 hover:bg-white/20 p-2 rounded-full text-white backdrop-blur-sm transition-colors"
+                onClick={(e) => { e.stopPropagation(); setEnlarged(false); }}
+              >
+                <X className="w-6 h-6 sm:w-8 sm:h-8" />
+              </button>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img 
+                src={imageUrl} 
+                alt="Enlarged solved puzzle" 
+                className="max-w-full max-h-full object-contain rounded-lg shadow-2xl" 
+                onClick={(e) => e.stopPropagation()}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </AnimatePresence>
   );

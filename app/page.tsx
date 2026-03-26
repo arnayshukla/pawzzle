@@ -107,6 +107,7 @@ export default function GamePage() {
             moves={puzzle.moves}
             time={puzzle.time}
             difficulty={puzzle.difficulty}
+            imageUrl={imageUrl || ""}
             onPlayAgain={puzzle.initPuzzle}
             onNewImage={fetchNewImage}
           />

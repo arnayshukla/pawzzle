@@ -37,6 +37,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, uploadedKeys });
   } catch (error) {
     console.error('Upload error:', error);
-    return NextResponse.json({ error: 'Failed to upload files' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to upload images' }, { status: 500 });
   }
 }
