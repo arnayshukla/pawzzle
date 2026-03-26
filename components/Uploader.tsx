@@ -83,6 +83,9 @@ export function Uploader() {
       setFiles([]);
       setStatus("success");
       setMessage(`Successfully uploaded ${files.length} image(s)!`);
+      
+      // Dispatch custom event to notify ImageGallery
+      window.dispatchEvent(new CustomEvent("photos-updated"));
     } catch (error) {
       console.error(error);
       setStatus("error");

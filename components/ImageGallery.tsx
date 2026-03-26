@@ -35,6 +35,10 @@ export function ImageGallery() {
 
   useEffect(() => {
     fetchImages();
+
+    const handleUpdate = () => fetchImages();
+    window.addEventListener("photos-updated", handleUpdate);
+    return () => window.removeEventListener("photos-updated", handleUpdate);
   }, []);
 
   const toggleSelect = (key: string) => {

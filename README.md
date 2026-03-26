@@ -1,36 +1,22 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🐾 Pawzzle - Dog Photo Puzzle Game
 
-## Getting Started
+Pawzzle is a fun, lightweight weekend hobby project created to turn your favorite dog photos into an engaging "swap-tile" puzzle game! 
 
-First, run the development server:
+## Why was this created?
+Because who doesn't love looking at cute dogs while giving their brain a tiny workout? It was built over a weekend to experiment with Next.js App Router, Cloudflare R2 storage, and framer-motion animations while producing something genuinely fun to share.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
+- **Swap-Tile Mechanics:** A mathematically guaranteed solvable puzzle every time!
+- **Dynamic Difficulty:** Play on a 3x3, 4x4, or 5x5 grid.
+- **Admin Dashboard:** Password-protected `/admin` route with bulk drag-and-drop uploads.
+- **Client-Side Compression:** High-res iPhone photos are compressed right in your browser before uploading to save bandwidth and storage.
+- **Cloudflare R2 Integration:** Super-fast, private image storage with auto-discovering galleries.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tech Stack
+- Next.js 16 (App Router)
+- React & TailwindCSS
+- Framer Motion (buttery smooth tile swaps)
+- Cloudflare R2 (S3-compatible object storage)
+- Vercel
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+If you enjoy the game or the code, consider [sponsoring me on GitHub](https://github.com/sponsors/arnayshukla)! ❤️
