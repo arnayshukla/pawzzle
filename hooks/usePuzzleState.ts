@@ -9,7 +9,7 @@ export const GRID_SIZES: Record<Difficulty, { rows: number; cols: number }> = {
 };
 
 export function usePuzzleState() {
-  const [difficulty, setDifficulty] = useState<Difficulty>('medium');
+  const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [order, setOrder] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
