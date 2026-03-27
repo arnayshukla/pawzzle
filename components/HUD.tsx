@@ -1,7 +1,7 @@
 "use client";
 
 import { Difficulty } from "@/hooks/usePuzzleState";
-import { Timer, Hash, RefreshCcw, Share2 } from "lucide-react";
+import { Timer, Hash, RefreshCcw } from "lucide-react";
 
 interface HUDProps {
   moves: number;
@@ -18,23 +18,6 @@ export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImag
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}:${s.toString().padStart(2, "0")}`;
-  };
-
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "Pawzzle | Dog Photo Puzzle",
-          text: "Can you solve this puzzle?",
-          url: window.location.origin,
-        });
-      } catch (err) {
-        console.error("Share failed", err);
-      }
-    } else {
-      navigator.clipboard.writeText(window.location.origin);
-      alert("Link copied to clipboard!");
-    }
   };
 
   return (
@@ -61,9 +44,9 @@ export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImag
             onChange={(e) => setDifficulty(e.target.value as Difficulty)}
             className="bg-zinc-100 dark:bg-zinc-800 border-none rounded-xl px-4 py-3 text-sm font-semibold cursor-pointer ring-1 ring-black/5 dark:ring-white/10 hover:ring-black/20 dark:hover:ring-white/20 focus:ring-2 focus:ring-black dark:focus:ring-white transition-all outline-none"
           >
-            <option value="easy">3×3 Grid</option>
-            <option value="medium">4×4 Grid</option>
-            <option value="hard">5×5 Grid</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
           </select>
         )}
 
@@ -85,14 +68,6 @@ export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImag
             New Image
           </button>
         )}
-
-        <button
-          onClick={handleShare}
-          className="p-3 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:scale-105 active:scale-95 transition-all"
-          title="Share"
-        >
-          <Share2 className="w-5 h-5" />
-        </button>
       </div>
     </div>
   );
