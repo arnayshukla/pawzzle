@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { playSound, triggerVibration } from '@/lib/sounds';
 
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -14,9 +15,10 @@ export function usePuzzleState() {
   const [moves, setMoves] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isSolved, setIsSolved] = useState(false);
+  const [showWinModal, setShowWinModal] = useState(false);
   const [time, setTime] = useState(0); // in seconds
   const [selectedTileIndex, setSelectedTileIndex] = useState<number | null>(null);
-  
+
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const { rows, cols } = GRID_SIZES[difficulty];
@@ -24,7 +26,7 @@ export function usePuzzleState() {
 
   const initPuzzle = useCallback(() => {
     const initialOrder = Array.from({ length: size }, (_, i) => i);
-    
+
     // Ensure the puzzle is actually shuffled and not solved initially
     let isShuffled = false;
     while (!isShuffled) {
@@ -39,6 +41,7 @@ export function usePuzzleState() {
     setMoves(0);
     setTime(0);
     setIsSolved(false);
+    setShowWinModal(false);
     setIsPlaying(true);
     setSelectedTileIndex(null);
   }, [size]);
@@ -50,6 +53,9 @@ export function usePuzzleState() {
       if (isWin) {
         setIsSolved(true);
         setIsPlaying(false);
+        playSound('win');
+        triggerVibration('success');
+        setTimeout(() => setShowWinModal(true), 500);
       }
     }
   }, [order, isPlaying]);
@@ -63,7 +69,7 @@ export function usePuzzleState() {
     } else if (timerRef.current) {
       clearInterval(timerRef.current);
     }
-    
+
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
@@ -74,12 +80,13 @@ export function usePuzzleState() {
 
     if (selectedTileIndex === null) {
       setSelectedTileIndex(index);
+      triggerVibration('light');
     } else {
       if (selectedTileIndex === index) {
-         setSelectedTileIndex(null);
-         return;
+        setSelectedTileIndex(null);
+        return;
       }
-      
+
       const newOrder = [...order];
       const temp = newOrder[index];
       newOrder[index] = newOrder[selectedTileIndex];
@@ -88,6 +95,8 @@ export function usePuzzleState() {
       setOrder(newOrder);
       setMoves((m) => m + 1);
       setSelectedTileIndex(null);
+      playSound('click');
+      triggerVibration('light');
     }
   };
 
@@ -100,6 +109,7 @@ export function usePuzzleState() {
     moves,
     time,
     isSolved,
+    showWinModal,
     isPlaying,
     selectedTileIndex,
     handleTileClick,

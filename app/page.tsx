@@ -28,10 +28,7 @@ export default function GamePage() {
       const data = await res.json();
       setImageUrl(data.url);
       
-      // Wait a tick for image to be somewhat ready
-      setTimeout(() => {
-        puzzle.initPuzzle();
-      }, 100);
+      puzzle.initPuzzle();
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -102,6 +99,8 @@ export default function GamePage() {
             </div>
           )}
 
+        {/* Win Modal */}
+        {puzzle.showWinModal && (
           <WinModal
             isSolved={puzzle.isSolved}
             moves={puzzle.moves}
@@ -111,6 +110,7 @@ export default function GamePage() {
             onPlayAgain={puzzle.initPuzzle}
             onNewImage={fetchNewImage}
           />
+        )}
         </div>
       )}
 

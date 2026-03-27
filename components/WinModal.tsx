@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Trophy, RefreshCcw, Image as ImageIcon, ZoomIn, X } from "lucide-react";
+import confetti from "canvas-confetti";
 import { Difficulty } from "@/hooks/usePuzzleState";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -31,6 +32,14 @@ export function WinModal({
 
   useEffect(() => {
     if (isSolved) {
+      // Fire confetti when modal opens
+      confetti({
+        particleCount: 150,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6']
+      });
+
       const storedBestMoves = localStorage.getItem(`bestMoves_${difficulty}`);
       const storedBestTime = localStorage.getItem(`bestTime_${difficulty}`);
 
