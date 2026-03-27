@@ -16,6 +16,8 @@ export default function DailyChallengePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasPlayedToday, setHasPlayedToday] = useState(false);
+  const [dailyData, setDailyData] = useState<{ moves: number; time: number } | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const fetchDailyImage = async () => {
     setLoading(true);
@@ -37,7 +39,11 @@ export default function DailyChallengePage() {
       
       if (existingRecord) {
         setHasPlayedToday(true);
-        // Load the solved state! (we don't strictly need to reload the whole board since they won, just tell them)
+        try {
+          setDailyData(JSON.parse(existingRecord));
+        } catch (e) {
+          // ignore parsing errors
+        }
       } else {
         puzzle.initPuzzle();
       }
@@ -91,22 +97,37 @@ export default function DailyChallengePage() {
           <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mt-4">{error}</p>
         </div>
       ) : hasPlayedToday && imageUrl && puzzle.order.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center gap-6 text-center max-w-md mx-auto fade-in">
+        <div className="flex-1 flex flex-col items-center justify-center gap-6 text-center max-w-md mx-auto fade-in w-full">
            <div className="text-5xl">🐾</div>
            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">You've completed today's challenge!</h2>
-           <p className="text-zinc-600 dark:text-zinc-400">Come back tomorrow for a new puzzle. In the meantime, try endless mode!</p>
+           
+           {dailyData && (
+             <div className="grid grid-cols-2 gap-4 w-full">
+               <div className="bg-zinc-100 dark:bg-zinc-800/50 rounded-2xl p-5 ring-1 ring-zinc-200 dark:ring-zinc-800 shadow-sm">
+                 <p className="text-xs uppercase tracking-wider font-bold text-zinc-400 dark:text-zinc-500 mb-1">Time</p>
+                 <p className="text-3xl font-mono font-bold text-zinc-900 dark:text-zinc-50">{dailyData.time}s</p>
+               </div>
+               <div className="bg-zinc-100 dark:bg-zinc-800/50 rounded-2xl p-5 ring-1 ring-zinc-200 dark:ring-zinc-800 shadow-sm">
+                 <p className="text-xs uppercase tracking-wider font-bold text-zinc-400 dark:text-zinc-500 mb-1">Moves</p>
+                 <p className="text-3xl font-mono font-bold text-zinc-900 dark:text-zinc-50">{dailyData.moves}</p>
+               </div>
+             </div>
+           )}
+
+           <p className="text-zinc-600 dark:text-zinc-400 mt-2">Come back tomorrow for a new puzzle. In the meantime, try endless mode!</p>
+           
            <button
               onClick={() => {
-                const data = JSON.parse(localStorage.getItem(`pawzzle_daily_${seedDate}`) || "{}");
-                const text = `Pawzzle Daily 🐾 ${seedDate}\nLevel: medium\nMoves: ${data.moves || 'N/A'} | Time: ${data.time || 'N/A'}s\nhttps://pawzzle.arnayshukla.com/daily`;
+                const text = `Pawzzle Daily 🐾 ${seedDate}\nLevel: medium\nMoves: ${dailyData?.moves || 'N/A'} | Time: ${dailyData?.time || 'N/A'}s\nhttps://pawzzle.arnayshukla.com/daily`;
                 navigator.clipboard.writeText(text);
-                alert("Copied to clipboard!");
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
               }}
-              className="mt-4 px-8 py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 shadow-xl"
+              className="mt-2 flex items-center justify-center w-full px-8 py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
-              Share Today's Result
+              {copied ? "Copied to Clipboard!" : "Share Today's Result"}
             </button>
-            <Link href="/" className="mt-2 text-zinc-500 underline font-medium hover:text-black dark:hover:text-white">
+            <Link href="/" className="mt-2 text-zinc-500 underline font-medium hover:text-black dark:hover:text-white transition-colors">
               Play Endless Mode
             </Link>
         </div>
