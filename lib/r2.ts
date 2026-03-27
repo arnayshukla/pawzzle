@@ -1,6 +1,7 @@
 import { S3Client, ListObjectsV2Command, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { unstable_cache } from "next/cache";
+import { getSeededRandom } from "./random";
 
 const accountId = process.env.R2_ACCOUNT_ID;
 const accessKeyId = process.env.R2_ACCESS_KEY_ID;
@@ -47,6 +48,28 @@ export async function getRandomImage() {
   const key = keys[Math.floor(Math.random() * keys.length)];
 
   // Generate a presigned URL valid for 15 minutes (900 seconds)
+  const getCommand = new GetObjectCommand({
+    Bucket: bucketName,
+    Key: key,
+  });
+
+  const url = await getSignedUrl(r2Client, getCommand, { expiresIn: 900 });
+
+  return { key, url };
+}
+
+export async function getDailyImage(seedString: string) {
+  const keys = await getCachedImageKeys();
+  
+  if (keys.length === 0) {
+    return null;
+  }
+
+  // Use the PRNG seeded by today's date to deterministically pick one image
+  const prng = getSeededRandom(seedString);
+  const randomIndex = Math.floor(prng() * keys.length);
+  const key = keys[randomIndex];
+
   const getCommand = new GetObjectCommand({
     Bucket: bucketName,
     Key: key,

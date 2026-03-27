@@ -5,6 +5,7 @@ import { Trophy, RefreshCcw, Image as ImageIcon, ZoomIn, X } from "lucide-react"
 import confetti from "canvas-confetti";
 import { Difficulty } from "@/hooks/usePuzzleState";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
 interface WinModalProps {
   isSolved: boolean;
@@ -14,6 +15,8 @@ interface WinModalProps {
   imageUrl: string;
   onPlayAgain: () => void;
   onNewImage: () => void;
+  isDaily?: boolean;
+  seedDate?: string;
 }
 
 export function WinModal({
@@ -24,11 +27,21 @@ export function WinModal({
   imageUrl,
   onPlayAgain,
   onNewImage,
+  isDaily,
+  seedDate,
 }: WinModalProps) {
   const [enlarged, setEnlarged] = useState(false);
   const [bestMoves, setBestMoves] = useState<number | null>(null);
   const [bestTime, setBestTime] = useState<number | null>(null);
   const [isNewHighScore, setIsNewHighScore] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleDailyShare = () => {
+    const text = `Pawzzle Daily 🐾 ${seedDate}\nLevel: ${difficulty}\nMoves: ${moves} | Time: ${time}s\nhttps://pawzzle.arnayshukla.com/daily`;
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   useEffect(() => {
     if (isSolved) {
@@ -123,20 +136,39 @@ export function WinModal({
           </div>
 
           <div className="flex flex-col gap-3">
-            <button
-              onClick={onNewImage}
-              className="flex items-center justify-center gap-2 w-full rounded-2xl bg-black px-4 py-4 text-sm font-bold tracking-wide text-white transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl dark:bg-white dark:text-black"
-            >
-              <ImageIcon className="w-5 h-5" />
-              Play Next Image
-            </button>
-            <button
-              onClick={onPlayAgain}
-              className="flex items-center justify-center gap-2 w-full rounded-2xl bg-zinc-100 px-4 py-4 text-sm font-bold tracking-wide text-zinc-900 transition-all hover:scale-[1.02] active:scale-[0.98] hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700"
-            >
-              <RefreshCcw className="w-5 h-5" />
-              Replay Exact Puzzle
-            </button>
+            {isDaily ? (
+              <>
+                <button
+                  onClick={handleDailyShare}
+                  className="flex items-center justify-center gap-2 w-full rounded-2xl bg-blue-600 px-4 py-4 text-sm font-bold tracking-wide text-white transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl hover:bg-blue-700"
+                >
+                  {copied ? "Copied to Clipboard!" : "Share Daily Result"}
+                </button>
+                <Link
+                  href="/"
+                  className="flex items-center justify-center gap-2 w-full rounded-2xl bg-zinc-100 px-4 py-4 text-sm font-bold tracking-wide text-zinc-900 transition-all hover:scale-[1.02] active:scale-[0.98] hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700"
+                >
+                  Play Endless Mode
+                </Link>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={onNewImage}
+                  className="flex items-center justify-center gap-2 w-full rounded-2xl bg-black px-4 py-4 text-sm font-bold tracking-wide text-white transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl dark:bg-white dark:text-black"
+                >
+                  <ImageIcon className="w-5 h-5" />
+                  Play Next Image
+                </button>
+                <button
+                  onClick={onPlayAgain}
+                  className="flex items-center justify-center gap-2 w-full rounded-2xl bg-zinc-100 px-4 py-4 text-sm font-bold tracking-wide text-zinc-900 transition-all hover:scale-[1.02] active:scale-[0.98] hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700"
+                >
+                  <RefreshCcw className="w-5 h-5" />
+                  Replay Exact Puzzle
+                </button>
+              </>
+            )}
           </div>
         </motion.div>
 

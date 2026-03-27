@@ -5,7 +5,8 @@ import { usePuzzleState } from "@/hooks/usePuzzleState";
 import { PuzzleBoard } from "@/components/PuzzleBoard";
 import { HUD } from "@/components/HUD";
 import { WinModal } from "@/components/WinModal";
-import { Loader2, ImageOff } from "lucide-react";
+import { Loader2, ImageOff, Calendar } from "lucide-react";
+import Link from "next/link";
 
 export default function GamePage() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -51,10 +52,20 @@ export default function GamePage() {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black font-sans flex flex-col pt-12 p-4 sm:p-8">
-      <h1 className="flex items-center justify-center gap-4 text-center text-4xl font-black tracking-tighter text-zinc-900 dark:text-white mb-8 select-none">
+      <h1 className="flex items-center justify-center gap-4 text-center text-4xl font-black tracking-tighter text-zinc-900 dark:text-white mb-4 select-none">
         <img src="/logo.png" alt="Pawzzle Logo" className="w-12 h-12 rounded-xl" />
         Pawzzle.
       </h1>
+
+      <div className="flex justify-center mb-8">
+        <Link 
+          href="/daily" 
+          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-amber-950 rounded-2xl font-bold rounded-2xl shadow-lg ring-1 ring-amber-400/50 transition-all hover:scale-105 active:scale-95"
+        >
+          <Calendar className="w-5 h-5" />
+          Play Daily Challenge
+        </Link>
+      </div>
 
       {loading ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-6">
