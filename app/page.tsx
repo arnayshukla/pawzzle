@@ -118,7 +118,6 @@ export default function GamePage() {
             setDifficulty={puzzle.setDifficulty}
             onReset={puzzle.initPuzzle}
             onNewImage={fetchNewImage}
-            puzzleId={`endless-${puzzle.difficulty}`}
           />
           
           {imageUrl && puzzle.order.length > 0 && (
