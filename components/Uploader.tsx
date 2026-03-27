@@ -11,6 +11,7 @@ export function Uploader() {
   const [isUploading, setIsUploading] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [category, setCategory] = useState("");
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -66,8 +67,12 @@ export function Uploader() {
         })
       );
 
+      console.log("Starting upload with category:", category);
       setMessage("Uploading to storage...");
       const formData = new FormData();
+      if (category.trim()) {
+        formData.append("category", category.trim());
+      }
       compressedFiles.forEach((file, index) => {
         // preserve the original file name because browser-image-compression sometimes renames to 'blob'
         formData.append("files", file, files[index].name);
@@ -81,6 +86,7 @@ export function Uploader() {
       if (!res.ok) throw new Error("Upload failed on the server");
 
       setFiles([]);
+      setCategory(""); // Reset category on success
       setStatus("success");
       setMessage(`Successfully uploaded ${files.length} image(s)!`);
 
@@ -97,6 +103,21 @@ export function Uploader() {
 
   return (
     <div className="space-y-6">
+      <div className="flex flex-col gap-2">
+        <label htmlFor="category" className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          Image Category / Tag (Optional)
+        </label>
+        <input
+          id="category"
+          type="text"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          placeholder="e.g. golden-retriever, funny, action"
+          disabled={isUploading}
+          className="w-full rounded-xl border-none bg-zinc-100 px-4 py-3 text-sm font-medium text-zinc-900 ring-1 ring-zinc-200 transition-all placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-50 dark:bg-zinc-800 dark:text-zinc-100 dark:ring-zinc-700 dark:placeholder:text-zinc-500 dark:focus:ring-white"
+        />
+      </div>
+
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
