@@ -15,6 +15,7 @@ export function usePuzzleState() {
   const [moves, setMoves] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isSolved, setIsSolved] = useState(false);
+  const [showWinModal, setShowWinModal] = useState(false);
   const [time, setTime] = useState(0); // in seconds
   const [selectedTileIndex, setSelectedTileIndex] = useState<number | null>(null);
   
@@ -40,6 +41,7 @@ export function usePuzzleState() {
     setMoves(0);
     setTime(0);
     setIsSolved(false);
+    setShowWinModal(false);
     setIsPlaying(true);
     setSelectedTileIndex(null);
   }, [size]);
@@ -53,6 +55,7 @@ export function usePuzzleState() {
         setIsPlaying(false);
         playSound('win');
         triggerVibration('success');
+        setTimeout(() => setShowWinModal(true), 1500);
       }
     }
   }, [order, isPlaying]);
@@ -106,6 +109,7 @@ export function usePuzzleState() {
     moves,
     time,
     isSolved,
+    showWinModal,
     isPlaying,
     selectedTileIndex,
     handleTileClick,

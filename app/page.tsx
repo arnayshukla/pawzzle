@@ -102,6 +102,8 @@ export default function GamePage() {
             </div>
           )}
 
+        {/* Win Modal */}
+        {puzzle.showWinModal && (
           <WinModal
             isSolved={puzzle.isSolved}
             moves={puzzle.moves}
@@ -111,6 +113,7 @@ export default function GamePage() {
             onPlayAgain={puzzle.initPuzzle}
             onNewImage={fetchNewImage}
           />
+        )}
         </div>
       )}
 
