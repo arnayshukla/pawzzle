@@ -7,7 +7,17 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const files = formData.getAll('files') as File[];
-    const category = formData.get('category') as string | null;
+    
+    // Parse the parallel array of categories sent alongside files
+    const categoriesRaw = formData.get('categories') as string | null;
+    let categories: string[] = [];
+    if (categoriesRaw) {
+      try {
+        categories = JSON.parse(categoriesRaw);
+      } catch (e) {
+        console.warn("Invalid categories JSON payload");
+      }
+    }
 
     if (!files || files.length === 0) {
       return NextResponse.json({ error: 'No files provided' }, { status: 400 });
@@ -36,23 +46,24 @@ export async function POST(request: Request) {
 
     const uploadedKeys = await Promise.all(uploadPromises);
 
-    // If a category is attached, pipe it into Vercel KV for O(1) random access later
-    if (category) {
-      const sanitizedCategory = category
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9-]/g, '-'); // safe characters only
-
-      if (sanitizedCategory.length > 0) {
-        const p = redis.pipeline();
-        // Add to global set of all available categories
-        p.sadd('categories', sanitizedCategory);
-        // Add file keys to this specific category's set
-        for (const key of uploadedKeys) {
+    // Pipe corresponding categories into Vercel KV for O(1) random access later
+    const p = redis.pipeline();
+    let hasCategories = false;
+    
+    uploadedKeys.forEach((key, index) => {
+      const cat = categories[index];
+      if (cat) {
+        const sanitizedCategory = cat.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+        if (sanitizedCategory.length > 0) {
+          p.sadd('categories', sanitizedCategory);
           p.sadd(`category:${sanitizedCategory}`, key);
+          hasCategories = true;
         }
-        await p.exec();
       }
+    });
+
+    if (hasCategories) {
+      await p.exec();
     }
 
     return NextResponse.json({ success: true, uploadedKeys });

@@ -15,6 +15,8 @@ export function ImageGallery() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [bulkTag, setBulkTag] = useState("");
+  const [tagging, setTagging] = useState(false);
 
   const fetchImages = async () => {
     setLoading(true);
@@ -82,6 +84,28 @@ export function ImageGallery() {
     }
   };
 
+  const handleBulkTag = async () => {
+    if (selectedKeys.size === 0 || !bulkTag.trim()) return;
+    setTagging(true);
+    try {
+      const keysToTag = Array.from(selectedKeys);
+      const res = await fetch("/api/admin/tag", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ keys: keysToTag, tag: bulkTag }),
+      });
+      if (!res.ok) throw new Error("Failed to tag images");
+      
+      setBulkTag("");
+      setSelectedKeys(new Set()); // Deselect after tagging
+      alert("Successfully tagged images!");
+    } catch (err: any) {
+      alert("Error: " + err.message);
+    } finally {
+      setTagging(false);
+    }
+  };
+
   if (loading && images.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-12 text-zinc-500">
@@ -127,14 +151,30 @@ export function ImageGallery() {
         </div>
         
         {selectedKeys.size > 0 && (
-          <button
-            onClick={handleDelete}
-            disabled={deleting}
-            className="flex items-center gap-2 bg-red-500 hover:bg-red-600 outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none"
-          >
-            {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-            Delete Selected ({selectedKeys.size})
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              type="text"
+              value={bulkTag}
+              onChange={(e) => setBulkTag(e.target.value)}
+              placeholder="Enter tag..."
+              className="px-3 py-2 text-sm rounded-xl border-none bg-zinc-100 dark:bg-zinc-800 ring-1 ring-zinc-200 dark:ring-zinc-700 outline-none focus:ring-2 focus:ring-black w-32 dark:text-zinc-100"
+            />
+            <button
+               onClick={handleBulkTag}
+               disabled={tagging || !bulkTag.trim()}
+               className="bg-black text-white px-4 py-2.5 text-sm rounded-xl font-bold disabled:opacity-50 dark:bg-white dark:text-black shadow-sm"
+            >
+               {tagging ? "..." : "Tag"}
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="flex items-center gap-2 bg-red-500 hover:bg-red-600 outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none"
+            >
+              {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+              Delete ({selectedKeys.size})
+            </button>
+          </div>
         )}
       </div>
 
