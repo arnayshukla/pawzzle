@@ -18,7 +18,7 @@ export function usePuzzleState() {
   const [showWinModal, setShowWinModal] = useState(false);
   const [time, setTime] = useState(0); // in seconds
   const [selectedTileIndex, setSelectedTileIndex] = useState<number | null>(null);
-  
+
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const { rows, cols } = GRID_SIZES[difficulty];
@@ -26,7 +26,7 @@ export function usePuzzleState() {
 
   const initPuzzle = useCallback(() => {
     const initialOrder = Array.from({ length: size }, (_, i) => i);
-    
+
     // Ensure the puzzle is actually shuffled and not solved initially
     let isShuffled = false;
     while (!isShuffled) {
@@ -55,7 +55,7 @@ export function usePuzzleState() {
         setIsPlaying(false);
         playSound('win');
         triggerVibration('success');
-        setTimeout(() => setShowWinModal(true), 1500);
+        setTimeout(() => setShowWinModal(true), 500);
       }
     }
   }, [order, isPlaying]);
@@ -69,7 +69,7 @@ export function usePuzzleState() {
     } else if (timerRef.current) {
       clearInterval(timerRef.current);
     }
-    
+
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
@@ -83,10 +83,10 @@ export function usePuzzleState() {
       triggerVibration('light');
     } else {
       if (selectedTileIndex === index) {
-         setSelectedTileIndex(null);
-         return;
+        setSelectedTileIndex(null);
+        return;
       }
-      
+
       const newOrder = [...order];
       const temp = newOrder[index];
       newOrder[index] = newOrder[selectedTileIndex];
