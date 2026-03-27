@@ -20,7 +20,7 @@ export default function DailyChallengePage() {
   const [dailyData, setDailyData] = useState<{ moves: number; time: number } | null>(null);
   const [copied, setCopied] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
-  const [shareText, setShareText] = useState("Share Route");
+  const [shareText, setShareText] = useState("Share Challenge");
 
   const fetchDailyImage = async () => {
     setLoading(true);
@@ -87,18 +87,18 @@ export default function DailyChallengePage() {
         Daily Canine
       </h1>
 
-      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-8 w-full max-w-4xl mx-auto">
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8 px-4 w-full max-w-3xl mx-auto">
         <Link 
           href="/" 
-          className="flex items-center justify-center gap-2 px-6 py-3 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-2xl shadow-md transition-all hover:scale-105 active:scale-95 text-sm sm:text-base w-full sm:w-auto"
+          className="flex items-center justify-center gap-2 px-6 py-3.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-2xl shadow-md transition-all hover:scale-105 active:scale-95 text-sm sm:text-base w-full sm:w-[210px]"
         >
-          Play Endless Mode
+          Endless Mode
         </Link>
 
         {seedDate && (
           <button 
             onClick={() => setShowLeaderboard(true)}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700 transition-all hover:scale-105 active:scale-95 text-sm sm:text-base flex-1 sm:flex-none"
+            className="flex items-center justify-center gap-2 px-6 py-3.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700 transition-all hover:scale-105 active:scale-95 text-sm sm:text-base w-full sm:w-[210px]"
           >
             <Trophy className="w-5 h-5 text-amber-500" />
             Leaderboard
@@ -109,9 +109,9 @@ export default function DailyChallengePage() {
           onClick={() => {
             navigator.clipboard.writeText("Play the Pawzzle Daily Canine Challenge!\n\nhttps://pawzzle.arnayshukla.com/daily");
             setShareText("Copied!");
-            setTimeout(() => setShareText("Share Route"), 2000);
+            setTimeout(() => setShareText("Share Challenge"), 2000);
           }}
-          className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 font-bold rounded-2xl shadow-sm ring-1 ring-blue-200 dark:ring-blue-800 transition-all hover:scale-105 active:scale-95 text-sm sm:text-base flex-1 sm:flex-none"
+          className="flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 font-bold rounded-2xl shadow-sm ring-1 ring-blue-200 dark:ring-blue-800 transition-all hover:scale-105 active:scale-95 text-sm sm:text-base w-full sm:w-[210px]"
         >
           <Share2 className="w-5 h-5" />
           {shareText}
@@ -150,21 +150,18 @@ export default function DailyChallengePage() {
 
            <p className="text-zinc-600 dark:text-zinc-400 mt-2">Come back tomorrow for a new puzzle. In the meantime, try endless mode!</p>
            
-           <button
-              onClick={() => {
-                const text = `Pawzzle Daily 🐾 ${seedDate}\nLevel: medium\nMoves: ${dailyData?.moves || 'N/A'} | Time: ${dailyData?.time || 'N/A'}s\nhttps://pawzzle.arnayshukla.com/daily`;
-                navigator.clipboard.writeText(text);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-              }}
-              className="mt-2 flex items-center justify-center w-full px-8 py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
-            >
-              {copied ? "Copied to Clipboard!" : "Share Today's Result"}
-            </button>
-            <Link href="/" className="mt-2 text-zinc-500 underline font-medium hover:text-black dark:hover:text-white transition-colors">
-              Play Endless Mode
-            </Link>
-        </div>
+             <button
+               onClick={() => {
+                 const text = `Pawzzle Daily 🐾 ${seedDate}\nLevel: medium\nMoves: ${dailyData?.moves || 'N/A'} | Time: ${dailyData?.time || 'N/A'}s\nhttps://pawzzle.arnayshukla.com/daily`;
+                 navigator.clipboard.writeText(text);
+                 setCopied(true);
+                 setTimeout(() => setCopied(false), 2000);
+               }}
+               className="mt-2 flex items-center justify-center w-full px-8 py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+             >
+               {copied ? "Copied to Clipboard!" : "Share Today's Result"}
+             </button>
+         </div>
       ) : (
         <div className="flex-1 flex flex-col items-center w-full max-w-4xl mx-auto">
           <HUD

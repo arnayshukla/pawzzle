@@ -232,7 +232,7 @@ export function WinModal({
                   className="flex items-center justify-center gap-2 w-full rounded-2xl bg-zinc-100 px-4 py-4 text-sm font-bold tracking-wide text-zinc-900 transition-all hover:scale-[1.02] active:scale-[0.98] hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700"
                 >
                   <RefreshCcw className="w-5 h-5" />
-                  Replay Exact Puzzle
+                  Back to Game
                 </button>
               </>
             )}

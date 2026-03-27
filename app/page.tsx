@@ -61,18 +61,18 @@ export default function GamePage() {
         Pawzzle.
       </h1>
 
-      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8 px-4 w-full max-w-3xl mx-auto">
         <Link 
           href="/daily" 
-          className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-amber-950 font-bold rounded-2xl shadow-md ring-1 ring-amber-400/50 transition-all hover:scale-105 active:scale-95 text-sm sm:text-base w-full sm:w-auto"
+          className="flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-amber-950 font-bold rounded-2xl shadow-md ring-1 ring-amber-400/50 transition-all hover:scale-105 active:scale-95 text-sm sm:text-base w-full sm:w-[210px]"
         >
           <Calendar className="w-5 h-5" />
-          Play Daily Challenge
+          Daily Challenge
         </Link>
 
         <button 
           onClick={() => setShowLeaderboard(true)}
-          className="flex items-center justify-center gap-2 px-6 py-3 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700 transition-all hover:scale-105 active:scale-95 text-sm sm:text-base flex-1 sm:flex-none"
+          className="flex items-center justify-center gap-2 px-6 py-3.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700 transition-all hover:scale-105 active:scale-95 text-sm sm:text-base w-full sm:w-[210px]"
         >
           <Trophy className="w-5 h-5 text-amber-500" />
           Leaderboard
@@ -84,7 +84,7 @@ export default function GamePage() {
             setShareText("Copied!");
             setTimeout(() => setShareText("Share Game"), 2000);
           }}
-          className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 font-bold rounded-2xl shadow-sm ring-1 ring-blue-200 dark:ring-blue-800 transition-all hover:scale-105 active:scale-95 text-sm sm:text-base flex-1 sm:flex-none"
+          className="flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 font-bold rounded-2xl shadow-sm ring-1 ring-blue-200 dark:ring-blue-800 transition-all hover:scale-105 active:scale-95 text-sm sm:text-base w-full sm:w-[210px]"
         >
           <Share2 className="w-5 h-5" />
           {shareText}
