@@ -28,6 +28,10 @@ export async function POST(request: Request) {
     }
 
     const uploadPromises = files.map(async (file) => {
+      if (!file.type.startsWith('image/')) {
+        throw new Error(`File ${file.name} is not a valid image format.`);
+      }
+
       const buffer = Buffer.from(await file.arrayBuffer());
       const uniqueId = crypto.randomUUID();
       const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');

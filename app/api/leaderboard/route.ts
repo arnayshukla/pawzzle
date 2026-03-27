@@ -6,8 +6,31 @@ export async function POST(req: Request) {
   try {
     const { name, time, moves, puzzleId } = await req.json();
 
-    if (!name || typeof time !== 'number' || typeof moves !== 'number' || !puzzleId) {
-      return NextResponse.json({ error: 'Missing or invalid fields' }, { status: 400 });
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+      return NextResponse.json({ error: 'Valid name is required' }, { status: 400 });
+    }
+    
+    if (typeof time !== 'number' || time <= 0 || typeof moves !== 'number' || moves <= 0) {
+      return NextResponse.json({ error: 'Invalid score metrics' }, { status: 400 });
+    }
+
+    if (!puzzleId || typeof puzzleId !== 'string') {
+      return NextResponse.json({ error: 'Invalid puzzle ID' }, { status: 400 });
+    }
+
+    const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
+    const rateLimitKey = `rl:leaderboard:${ip}`;
+    
+    // Upstash Redis atomic increment & expire mapping
+    const p = redis.pipeline();
+    p.incr(rateLimitKey);
+    p.expire(rateLimitKey, 60); // 1 minute window
+    
+    const [requests] = await p.exec();
+    
+    // Max 10 score submissions per IP per 60 seconds
+    if ((requests as number) > 10) {
+      return NextResponse.json({ error: 'Too many submissions, please wait a minute.' }, { status: 429 });
     }
 
     const scoreId = randomUUID();
