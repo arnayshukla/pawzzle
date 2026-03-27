@@ -5,13 +5,17 @@ import { usePuzzleState } from "@/hooks/usePuzzleState";
 import { PuzzleBoard } from "@/components/PuzzleBoard";
 import { HUD } from "@/components/HUD";
 import { WinModal } from "@/components/WinModal";
-import { Loader2, ImageOff, Calendar } from "lucide-react";
+import { Loader2, ImageOff, Calendar, Trophy, Share2 } from "lucide-react";
 import Link from "next/link";
+import { Leaderboard } from "@/components/Leaderboard";
+import { AnimatePresence } from "framer-motion";
 
 export default function GamePage() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [shareText, setShareText] = useState("Share Game");
   
   const puzzle = usePuzzleState();
 
@@ -53,18 +57,38 @@ export default function GamePage() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black font-sans flex flex-col pt-12 p-4 sm:p-8">
       <h1 className="flex items-center justify-center gap-4 text-center text-4xl font-black tracking-tighter text-zinc-900 dark:text-white mb-4 select-none">
-        <img src="/logo.png" alt="Pawzzle Logo" className="w-12 h-12 rounded-xl" />
+        <img src="/logo.png" alt="Pawzzle Logo" className="w-12 h-12 rounded-xl ring-2 ring-zinc-900 dark:ring-white" />
         Pawzzle.
       </h1>
 
-      <div className="flex justify-center mb-8">
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-8">
         <Link 
           href="/daily" 
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-amber-950 rounded-2xl font-bold rounded-2xl shadow-lg ring-1 ring-amber-400/50 transition-all hover:scale-105 active:scale-95"
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-amber-950 font-bold rounded-2xl shadow-md ring-1 ring-amber-400/50 transition-all hover:scale-105 active:scale-95 text-sm sm:text-base w-full sm:w-auto"
         >
           <Calendar className="w-5 h-5" />
           Play Daily Challenge
         </Link>
+
+        <button 
+          onClick={() => setShowLeaderboard(true)}
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700 transition-all hover:scale-105 active:scale-95 text-sm sm:text-base flex-1 sm:flex-none"
+        >
+          <Trophy className="w-5 h-5 text-amber-500" />
+          Leaderboard
+        </button>
+
+        <button 
+          onClick={() => {
+            navigator.clipboard.writeText("Play Pawzzle: a daily sliding puzzle game!\n\nhttps://pawzzle.arnayshukla.com");
+            setShareText("Copied!");
+            setTimeout(() => setShareText("Share Game"), 2000);
+          }}
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 font-bold rounded-2xl shadow-sm ring-1 ring-blue-200 dark:ring-blue-800 transition-all hover:scale-105 active:scale-95 text-sm sm:text-base flex-1 sm:flex-none"
+        >
+          <Share2 className="w-5 h-5" />
+          {shareText}
+        </button>
       </div>
 
       {loading ? (
@@ -126,6 +150,15 @@ export default function GamePage() {
         )}
         </div>
       )}
+
+      <AnimatePresence>
+        {showLeaderboard && (
+          <Leaderboard 
+            puzzleId={`endless-${puzzle.difficulty}`} 
+            onClose={() => setShowLeaderboard(false)} 
+          />
+        )}
+      </AnimatePresence>
 
       {/* Sponsorship FAB */}
       <a

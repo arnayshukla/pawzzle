@@ -5,9 +5,10 @@ import { usePuzzleState } from "@/hooks/usePuzzleState";
 import { PuzzleBoard } from "@/components/PuzzleBoard";
 import { HUD } from "@/components/HUD";
 import { WinModal } from "@/components/WinModal";
-import { Loader2, ImageOff, ArrowLeft } from "lucide-react";
+import { Loader2, ImageOff, ArrowLeft, Trophy, Share2 } from "lucide-react";
 import Link from "next/link";
 import { AnimatePresence } from "framer-motion";
+import { Leaderboard } from "@/components/Leaderboard";
 
 export default function DailyChallengePage() {
   const puzzle = usePuzzleState(true); // isDaily = true
@@ -18,6 +19,8 @@ export default function DailyChallengePage() {
   const [hasPlayedToday, setHasPlayedToday] = useState(false);
   const [dailyData, setDailyData] = useState<{ moves: number; time: number } | null>(null);
   const [copied, setCopied] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [shareText, setShareText] = useState("Share Route");
 
   const fetchDailyImage = async () => {
     setLoading(true);
@@ -79,10 +82,41 @@ export default function DailyChallengePage() {
         <span className="hidden sm:inline">Back</span>
       </Link>
 
-      <h1 className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center text-4xl font-black tracking-tighter text-amber-500 dark:text-amber-400 mb-8 select-none">
+      <h1 className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center text-4xl font-black tracking-tighter text-amber-500 dark:text-amber-400 mb-6 select-none">
         <img src="/logo.png" alt="Pawzzle Logo" className="w-12 h-12 rounded-xl ring-2 ring-amber-400" />
         Daily Canine
       </h1>
+
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-8 w-full max-w-4xl mx-auto">
+        <Link 
+          href="/" 
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-2xl shadow-md transition-all hover:scale-105 active:scale-95 text-sm sm:text-base w-full sm:w-auto"
+        >
+          Play Endless Mode
+        </Link>
+
+        {seedDate && (
+          <button 
+            onClick={() => setShowLeaderboard(true)}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700 transition-all hover:scale-105 active:scale-95 text-sm sm:text-base flex-1 sm:flex-none"
+          >
+            <Trophy className="w-5 h-5 text-amber-500" />
+            Leaderboard
+          </button>
+        )}
+
+        <button 
+          onClick={() => {
+            navigator.clipboard.writeText("Play the Pawzzle Daily Canine Challenge!\n\nhttps://pawzzle.arnayshukla.com/daily");
+            setShareText("Copied!");
+            setTimeout(() => setShareText("Share Route"), 2000);
+          }}
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 font-bold rounded-2xl shadow-sm ring-1 ring-blue-200 dark:ring-blue-800 transition-all hover:scale-105 active:scale-95 text-sm sm:text-base flex-1 sm:flex-none"
+        >
+          <Share2 className="w-5 h-5" />
+          {shareText}
+        </button>
+      </div>
 
       {loading ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-6">
@@ -175,6 +209,15 @@ export default function DailyChallengePage() {
           )}
         </div>
       )}
+      
+      <AnimatePresence>
+        {showLeaderboard && seedDate && (
+          <Leaderboard 
+            puzzleId={`daily-${seedDate}`} 
+            onClose={() => setShowLeaderboard(false)} 
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

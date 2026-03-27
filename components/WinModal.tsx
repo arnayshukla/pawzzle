@@ -183,13 +183,13 @@ export function WinModal({
                   value={playerName}
                   onChange={(e) => setPlayerName(e.target.value)}
                   maxLength={20}
-                  className="flex-1 bg-white dark:bg-zinc-800 rounded-xl px-4 py-2 border border-zinc-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:text-white"
+                  className="flex-1 min-w-0 w-full bg-white dark:bg-zinc-800 rounded-xl px-4 py-2 border border-zinc-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:text-white"
                   onKeyDown={(e) => e.key === 'Enter' && submitScore()}
                 />
                 <button
                   onClick={submitScore}
                   disabled={!playerName.trim() || isSubmitting}
-                  className="px-4 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-colors"
+                  className="px-4 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-colors shrink-0"
                 >
                   {isSubmitting ? "..." : "Save"}
                 </button>
