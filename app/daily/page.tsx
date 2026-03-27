@@ -141,6 +141,7 @@ export default function DailyChallengePage() {
             onReset={puzzle.initPuzzle}
             onNewImage={fetchDailyImage}
             isDaily={true}
+            puzzleId={`daily-${seedDate}`}
           />
           
           {imageUrl && puzzle.order.length > 0 && (
@@ -169,6 +170,7 @@ export default function DailyChallengePage() {
               onNewImage={fetchDailyImage}
               isDaily={true}
               seedDate={seedDate}
+              puzzleId={`daily-${seedDate}`}
             />
           )}
         </div>

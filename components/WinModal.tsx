@@ -17,6 +17,7 @@ interface WinModalProps {
   onNewImage: () => void;
   isDaily?: boolean;
   seedDate?: string;
+  puzzleId: string;
 }
 
 export function WinModal({
@@ -29,18 +30,51 @@ export function WinModal({
   onNewImage,
   isDaily,
   seedDate,
+  puzzleId,
 }: WinModalProps) {
   const [enlarged, setEnlarged] = useState(false);
   const [bestMoves, setBestMoves] = useState<number | null>(null);
   const [bestTime, setBestTime] = useState<number | null>(null);
   const [isNewHighScore, setIsNewHighScore] = useState(false);
   const [copied, setCopied] = useState(false);
+  
+  // Leaderboard State
+  const [playerName, setPlayerName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const handleDailyShare = () => {
     const text = `Pawzzle Daily 🐾 ${seedDate}\nLevel: ${difficulty}\nMoves: ${moves} | Time: ${time}s\nhttps://pawzzle.arnayshukla.com/daily`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const submitScore = async () => {
+    if (!playerName.trim()) return;
+    setIsSubmitting(true);
+    setSubmitError("");
+    
+    try {
+      const res = await fetch("/api/leaderboard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: playerName,
+          time,
+          moves,
+          puzzleId
+        })
+      });
+      
+      if (!res.ok) throw new Error("Failed to submit score");
+      setHasSubmitted(true);
+    } catch (err: any) {
+      setSubmitError(err.message || "Could not submit score");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   useEffect(() => {
@@ -134,6 +168,39 @@ export function WinModal({
               )}
             </div>
           </div>
+
+          {/* Leaderboard Submission Block */}
+          {!hasSubmitted ? (
+            <div className="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 text-left">
+              <label htmlFor="playerName" className="block text-xs uppercase tracking-wider font-bold text-amber-700 dark:text-amber-500 mb-2">
+                Submit to Leaderboard
+              </label>
+              <div className="flex gap-2">
+                <input
+                  id="playerName"
+                  type="text"
+                  placeholder="Enter your name..."
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value)}
+                  maxLength={20}
+                  className="flex-1 bg-white dark:bg-zinc-800 rounded-xl px-4 py-2 border border-zinc-200 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:text-white"
+                  onKeyDown={(e) => e.key === 'Enter' && submitScore()}
+                />
+                <button
+                  onClick={submitScore}
+                  disabled={!playerName.trim() || isSubmitting}
+                  className="px-4 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-colors"
+                >
+                  {isSubmitting ? "..." : "Save"}
+                </button>
+              </div>
+              {submitError && <p className="text-red-500 text-xs mt-2 font-medium">{submitError}</p>}
+            </div>
+          ) : (
+             <div className="mb-6 p-4 rounded-2xl bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-900/30 text-green-700 dark:text-green-500 font-bold text-sm text-center">
+               Score successfully submitted!
+             </div>
+          )}
 
           <div className="flex flex-col gap-3">
             {isDaily ? (

@@ -94,6 +94,7 @@ export default function GamePage() {
             setDifficulty={puzzle.setDifficulty}
             onReset={puzzle.initPuzzle}
             onNewImage={fetchNewImage}
+            puzzleId={`endless-${puzzle.difficulty}`}
           />
           
           {imageUrl && puzzle.order.length > 0 && (
@@ -120,6 +121,7 @@ export default function GamePage() {
             imageUrl={imageUrl || ""}
             onPlayAgain={puzzle.initPuzzle}
             onNewImage={fetchNewImage}
+            puzzleId={`endless-${puzzle.difficulty}`}
           />
         )}
         </div>

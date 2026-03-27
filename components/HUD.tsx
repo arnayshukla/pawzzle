@@ -1,7 +1,10 @@
 "use client";
 
 import { Difficulty } from "@/hooks/usePuzzleState";
-import { Timer, Hash, RefreshCcw, Share2 } from "lucide-react";
+import { Timer, Hash, RefreshCcw, Share2, Trophy } from "lucide-react";
+import { Leaderboard } from "./Leaderboard";
+import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
 
 interface HUDProps {
   moves: number;
@@ -11,9 +14,11 @@ interface HUDProps {
   onReset: () => void;
   onNewImage: () => void;
   isDaily?: boolean;
+  puzzleId: string;
 }
 
-export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImage, isDaily }: HUDProps) {
+export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImage, isDaily, puzzleId }: HUDProps) {
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -87,6 +92,14 @@ export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImag
         )}
 
         <button
+          onClick={() => setShowLeaderboard(true)}
+          className="p-3 rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/50 hover:scale-105 active:scale-95 transition-all"
+          title="Leaderboard"
+        >
+          <Trophy className="w-5 h-5" />
+        </button>
+
+        <button
           onClick={handleShare}
           className="p-3 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:scale-105 active:scale-95 transition-all"
           title="Share"
@@ -94,6 +107,15 @@ export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImag
           <Share2 className="w-5 h-5" />
         </button>
       </div>
+
+      <AnimatePresence>
+        {showLeaderboard && (
+          <Leaderboard 
+            puzzleId={puzzleId} 
+            onClose={() => setShowLeaderboard(false)} 
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
