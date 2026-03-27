@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { Eye } from "lucide-react";
 
 interface PuzzleBoardProps {
   rows: number;
@@ -22,9 +24,12 @@ export function PuzzleBoard({
   imageUrl,
   isSolved,
 }: PuzzleBoardProps) {
+  const [isPeeking, setIsPeeking] = useState(false);
+
   return (
-    <div 
-      className="relative w-full max-w-2xl aspect-square mx-auto bg-zinc-200 dark:bg-zinc-800 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-black/5 dark:ring-white/10"
+    <div className="relative group w-full max-w-2xl mx-auto rounded-2xl shadow-2xl ring-1 ring-black/5 dark:ring-white/10 select-none">
+      <div 
+        className="relative w-full aspect-square bg-zinc-200 dark:bg-zinc-800 rounded-2xl overflow-hidden"
       style={{
         display: "grid",
         gridTemplateColumns: `repeat(${cols}, 1fr)`,
@@ -70,6 +75,29 @@ export function PuzzleBoard({
           />
         );
       })}
+      </div>
+
+      {/* Peek image overlay */}
+      {isPeeking && !isSolved && (
+        <div 
+          className="absolute inset-0 z-20 rounded-2xl bg-cover bg-center shadow-inner pointer-events-none" 
+          style={{ backgroundImage: `url(${imageUrl})` }} 
+        />
+      )}
+
+      {/* Peek Button Container */}
+      {!isSolved && (
+        <button 
+          className="absolute -top-3 -right-3 sm:-right-4 sm:-top-4 z-30 p-2.5 sm:p-3 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 shadow-xl ring-1 ring-black/10 dark:ring-white/10 rounded-full text-zinc-700 dark:text-zinc-300 transition-transform active:scale-95 cursor-help"
+          onPointerDown={(e) => { e.preventDefault(); setIsPeeking(true); }}
+          onPointerUp={() => setIsPeeking(false)}
+          onPointerLeave={() => setIsPeeking(false)}
+          onContextMenu={(e) => e.preventDefault()}
+          title="Hold to peek at original image"
+        >
+          <Eye className="w-5 h-5 sm:w-6 sm:h-6" />
+        </button>
+      )}
     </div>
   );
 }

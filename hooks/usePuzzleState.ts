@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { playSound, triggerVibration } from '@/lib/sounds';
 
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -50,6 +51,8 @@ export function usePuzzleState() {
       if (isWin) {
         setIsSolved(true);
         setIsPlaying(false);
+        playSound('win');
+        triggerVibration('success');
       }
     }
   }, [order, isPlaying]);
@@ -74,6 +77,7 @@ export function usePuzzleState() {
 
     if (selectedTileIndex === null) {
       setSelectedTileIndex(index);
+      triggerVibration('light');
     } else {
       if (selectedTileIndex === index) {
          setSelectedTileIndex(null);
@@ -88,6 +92,8 @@ export function usePuzzleState() {
       setOrder(newOrder);
       setMoves((m) => m + 1);
       setSelectedTileIndex(null);
+      playSound('click');
+      triggerVibration('light');
     }
   };
 
