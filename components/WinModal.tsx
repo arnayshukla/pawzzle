@@ -5,6 +5,7 @@ import { Trophy, RefreshCcw, Image as ImageIcon, ZoomIn, X } from "lucide-react"
 import confetti from "canvas-confetti";
 import { Difficulty } from "@/hooks/usePuzzleState";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
 interface WinModalProps {
   isSolved: boolean;
@@ -136,12 +137,20 @@ export function WinModal({
 
           <div className="flex flex-col gap-3">
             {isDaily ? (
-              <button
-                onClick={handleDailyShare}
-                className="flex items-center justify-center gap-2 w-full rounded-2xl bg-blue-600 px-4 py-4 text-sm font-bold tracking-wide text-white transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl hover:bg-blue-700"
-              >
-                {copied ? "Copied to Clipboard!" : "Share Daily Result"}
-              </button>
+              <>
+                <button
+                  onClick={handleDailyShare}
+                  className="flex items-center justify-center gap-2 w-full rounded-2xl bg-blue-600 px-4 py-4 text-sm font-bold tracking-wide text-white transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl hover:bg-blue-700"
+                >
+                  {copied ? "Copied to Clipboard!" : "Share Daily Result"}
+                </button>
+                <Link
+                  href="/"
+                  className="flex items-center justify-center gap-2 w-full rounded-2xl bg-zinc-100 px-4 py-4 text-sm font-bold tracking-wide text-zinc-900 transition-all hover:scale-[1.02] active:scale-[0.98] hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700"
+                >
+                  Play Endless Mode
+                </Link>
+              </>
             ) : (
               <>
                 <button
