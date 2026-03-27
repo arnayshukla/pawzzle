@@ -39,8 +39,6 @@ export default function DailyChallengePage() {
         setHasPlayedToday(true);
         // Load the solved state! (we don't strictly need to reload the whole board since they won, just tell them)
       } else {
-        // Enforce medium difficulty globally for daily
-        puzzle.setDifficulty("medium");
         puzzle.initPuzzle();
       }
     } catch (err: any) {
