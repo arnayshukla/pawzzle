@@ -70,7 +70,7 @@ export default function GamePage() {
   }, [puzzle.difficulty]);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black font-sans flex flex-col pt-12 p-4 sm:p-8">
+    <div className="min-h-screen bg-zinc-50 dark:bg-black font-sans flex flex-col pt-12 p-4 sm:p-8 pb-24 sm:pb-32">
       <h1 className="flex items-center justify-center gap-4 text-center text-4xl font-black tracking-tighter text-zinc-900 dark:text-white mb-4 select-none">
         <img src="/logo.png" alt="Pawzzle Logo" className="w-12 h-12 rounded-xl ring-2 ring-zinc-900 dark:ring-white" />
         Pawzzle.
@@ -114,7 +114,7 @@ export default function GamePage() {
                 setSelectedCategory("all");
                 fetchNewImage("all");
               }}
-              className={`snap-start whitespace-nowrap px-5 py-2.5 rounded-full font-bold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white ${
+              className={`snap-start whitespace-nowrap px-5 py-2.5 rounded-2xl font-bold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white ${
                 selectedCategory === "all"
                   ? "bg-black text-white dark:bg-white dark:text-black shadow-md ring-1 ring-black dark:ring-white"
                   : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
@@ -129,7 +129,7 @@ export default function GamePage() {
                   setSelectedCategory(cat);
                   fetchNewImage(cat);
                 }}
-                className={`snap-start whitespace-nowrap px-5 py-2.5 rounded-full font-bold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white capitalize ${
+                className={`snap-start whitespace-nowrap px-5 py-2.5 rounded-2xl font-bold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white capitalize ${
                   selectedCategory === cat
                     ? "bg-black text-white dark:bg-white dark:text-black shadow-md ring-1 ring-black dark:ring-white"
                     : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
