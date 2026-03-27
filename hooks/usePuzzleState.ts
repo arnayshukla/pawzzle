@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { playSound, triggerVibration } from '@/lib/sounds';
+import { getDailyRandom } from '@/lib/random';
 
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -9,7 +10,7 @@ export const GRID_SIZES: Record<Difficulty, { rows: number; cols: number }> = {
   hard: { rows: 5, cols: 5 },
 };
 
-export function usePuzzleState() {
+export function usePuzzleState(isDaily: boolean = false) {
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [order, setOrder] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
@@ -26,12 +27,13 @@ export function usePuzzleState() {
 
   const initPuzzle = useCallback(() => {
     const initialOrder = Array.from({ length: size }, (_, i) => i);
+    const prng = isDaily ? getDailyRandom() : Math.random;
 
     // Ensure the puzzle is actually shuffled and not solved initially
     let isShuffled = false;
     while (!isShuffled) {
       for (let i = initialOrder.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = Math.floor(prng() * (i + 1));
         [initialOrder[i], initialOrder[j]] = [initialOrder[j], initialOrder[i]];
       }
       isShuffled = !initialOrder.every((val, index) => val === index);

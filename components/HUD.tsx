@@ -10,9 +10,10 @@ interface HUDProps {
   setDifficulty: (diff: Difficulty) => void;
   onReset: () => void;
   onNewImage: () => void;
+  isDaily?: boolean;
 }
 
-export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImage }: HUDProps) {
+export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImage, isDaily }: HUDProps) {
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -50,30 +51,40 @@ export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImag
       </div>
 
       <div className="flex items-center gap-2">
-        <select
-          value={difficulty}
-          onChange={(e) => setDifficulty(e.target.value as Difficulty)}
-          className="bg-zinc-100 dark:bg-zinc-800 border-none rounded-xl px-4 py-3 text-sm font-semibold cursor-pointer ring-1 ring-black/5 dark:ring-white/10 hover:ring-black/20 dark:hover:ring-white/20 focus:ring-2 focus:ring-black dark:focus:ring-white transition-all outline-none"
-        >
-          <option value="easy">3×3 Grid</option>
-          <option value="medium">4×4 Grid</option>
-          <option value="hard">5×5 Grid</option>
-        </select>
+        {isDaily ? (
+          <div className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 px-4 py-2.5 rounded-xl font-bold text-sm tracking-wide flex items-center justify-center border border-amber-200 dark:border-amber-700/50 mr-2 shadow-sm">
+            Canine Challenge
+          </div>
+        ) : (
+          <select
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value as Difficulty)}
+            className="bg-zinc-100 dark:bg-zinc-800 border-none rounded-xl px-4 py-3 text-sm font-semibold cursor-pointer ring-1 ring-black/5 dark:ring-white/10 hover:ring-black/20 dark:hover:ring-white/20 focus:ring-2 focus:ring-black dark:focus:ring-white transition-all outline-none"
+          >
+            <option value="easy">3×3 Grid</option>
+            <option value="medium">4×4 Grid</option>
+            <option value="hard">5×5 Grid</option>
+          </select>
+        )}
 
-        <button
-          onClick={onReset}
-          className="p-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:scale-105 active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white"
-          title="Restart Puzzle"
-        >
-          <RefreshCcw className="w-5 h-5" />
-        </button>
+        {!isDaily && (
+          <button
+            onClick={onReset}
+            className="p-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:scale-105 active:scale-95 transition-all outline-none focus-visible:ring-2 focus-visible:ring-black dark:focus-visible:ring-white"
+            title="Restart Puzzle"
+          >
+            <RefreshCcw className="w-5 h-5" />
+          </button>
+        )}
 
-        <button
-          onClick={onNewImage}
-          className="px-5 py-3 rounded-xl bg-black text-white dark:bg-white dark:text-black font-semibold text-sm hover:scale-105 active:scale-95 transition-all shadow-md hover:shadow-lg"
-        >
-          New Image
-        </button>
+        {!isDaily && (
+          <button
+            onClick={onNewImage}
+            className="px-5 py-3 rounded-xl bg-black text-white dark:bg-white dark:text-black font-semibold text-sm hover:scale-105 active:scale-95 transition-all shadow-md hover:shadow-lg"
+          >
+            New Image
+          </button>
+        )}
 
         <button
           onClick={handleShare}
