@@ -2,6 +2,7 @@ import { S3Client, ListObjectsV2Command, GetObjectCommand } from "@aws-sdk/clien
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { unstable_cache } from "next/cache";
 import { getSeededRandom } from "./random";
+import { redis } from "./redis";
 
 const accountId = process.env.R2_ACCOUNT_ID;
 const accessKeyId = process.env.R2_ACCESS_KEY_ID;
@@ -77,5 +78,22 @@ export async function getDailyImage(seedString: string) {
 
   const url = await getSignedUrl(r2Client, getCommand, { expiresIn: 900 });
 
+  return { key, url };
+}
+
+export async function getRandomImageByCategory(category: string) {
+  if (!bucketName) return null;
+  
+  // O(1) Instant random selection using Vercel KV Set!
+  const key = await redis.srandmember(`category:${category}`);
+  
+  if (!key) return null;
+  
+  const getCommand = new GetObjectCommand({
+    Bucket: bucketName,
+    Key: key as string,
+  });
+
+  const url = await getSignedUrl(r2Client, getCommand, { expiresIn: 900 });
   return { key, url };
 }

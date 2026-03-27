@@ -17,15 +17,19 @@ export default function GamePage() {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [shareText, setShareText] = useState("Share Game");
   
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  
   const puzzle = usePuzzleState();
 
-  const fetchNewImage = async () => {
+  const fetchNewImage = async (categoryToFetch = selectedCategory) => {
     setLoading(true);
     setError(null);
     puzzle.setIsPlaying(false);
     
     try {
-      const res = await fetch("/api/game/image");
+      const url = categoryToFetch === "all" ? "/api/game/image" : `/api/game/image?category=${categoryToFetch}`;
+      const res = await fetch(url);
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || "Failed to fetch image");
@@ -42,7 +46,18 @@ export default function GamePage() {
   };
 
   useEffect(() => {
-    fetchNewImage();
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/categories");
+        const data = await res.json();
+        setCategories(data.categories || []);
+      } catch (err) {
+        console.error("Failed to fetch categories", err);
+      }
+    };
+    
+    fetchCategories();
+    fetchNewImage("all");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only on mount
 
@@ -55,7 +70,7 @@ export default function GamePage() {
   }, [puzzle.difficulty]);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black font-sans flex flex-col pt-12 p-4 sm:p-8">
+    <div className="min-h-screen bg-zinc-50 dark:bg-black font-sans flex flex-col pt-12 p-4 sm:p-8 pb-24 sm:pb-32">
       <h1 className="flex items-center justify-center gap-4 text-center text-4xl font-black tracking-tighter text-zinc-900 dark:text-white mb-4 select-none">
         <img src="/logo.png" alt="Pawzzle Logo" className="w-12 h-12 rounded-xl ring-2 ring-zinc-900 dark:ring-white" />
         Pawzzle.
@@ -91,6 +106,42 @@ export default function GamePage() {
         </button>
       </div>
 
+      {categories.length > 0 && (
+        <div className="w-full max-w-2xl mx-auto mb-4 sm:mb-8 px-4 overflow-hidden">
+          <div className="flex items-center gap-2 overflow-x-auto pb-4 scrollbar-hide snap-x" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <button
+              onClick={() => {
+                setSelectedCategory("all");
+                fetchNewImage("all");
+              }}
+              className={`snap-start whitespace-nowrap px-5 py-2.5 rounded-2xl font-bold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white ${
+                selectedCategory === "all"
+                  ? "bg-black text-white dark:bg-white dark:text-black shadow-md ring-1 ring-black dark:ring-white"
+                  : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+              }`}
+            >
+              All Images
+            </button>
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => {
+                  setSelectedCategory(cat);
+                  fetchNewImage(cat);
+                }}
+                className={`snap-start whitespace-nowrap px-5 py-2.5 rounded-2xl font-bold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white capitalize ${
+                  selectedCategory === cat
+                    ? "bg-black text-white dark:bg-white dark:text-black shadow-md ring-1 ring-black dark:ring-white"
+                    : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+                }`}
+              >
+                {cat.replace(/-/g, ' ')}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-6">
           <Loader2 className="w-10 h-10 animate-spin text-zinc-300 dark:text-zinc-600" />
@@ -103,7 +154,7 @@ export default function GamePage() {
           </div>
           <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mt-4">{error}</p>
           <button
-            onClick={fetchNewImage}
+            onClick={() => fetchNewImage(selectedCategory)}
             className="mt-6 px-8 py-4 bg-black text-white rounded-2xl font-bold tracking-wide dark:bg-white dark:text-black hover:scale-105 active:scale-95 transition-all shadow-xl"
           >
             Try Again
@@ -117,7 +168,7 @@ export default function GamePage() {
             difficulty={puzzle.difficulty}
             setDifficulty={puzzle.setDifficulty}
             onReset={puzzle.initPuzzle}
-            onNewImage={fetchNewImage}
+            onNewImage={() => fetchNewImage(selectedCategory)}
           />
           
           {imageUrl && puzzle.order.length > 0 && (
@@ -143,7 +194,7 @@ export default function GamePage() {
             difficulty={puzzle.difficulty}
             imageUrl={imageUrl || ""}
             onPlayAgain={puzzle.initPuzzle}
-            onNewImage={fetchNewImage}
+            onNewImage={() => fetchNewImage(selectedCategory)}
             puzzleId={`endless-${puzzle.difficulty}`}
           />
         )}

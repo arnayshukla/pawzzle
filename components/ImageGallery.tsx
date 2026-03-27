@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Trash2, Loader2, AlertTriangle, RefreshCcw } from "lucide-react";
+import { Trash2, Loader2, AlertTriangle, RefreshCcw, Check } from "lucide-react";
 
 interface R2Image {
   key: string;
   url: string;
+  tags?: string[];
 }
 
 export function ImageGallery() {
@@ -15,6 +16,9 @@ export function ImageGallery() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [bulkTag, setBulkTag] = useState("");
+  const [tagging, setTagging] = useState(false);
+  const [showTagSuccess, setShowTagSuccess] = useState(false);
 
   const fetchImages = async () => {
     setLoading(true);
@@ -82,6 +86,30 @@ export function ImageGallery() {
     }
   };
 
+  const handleBulkTag = async () => {
+    if (selectedKeys.size === 0 || !bulkTag.trim()) return;
+    setTagging(true);
+    try {
+      const keysToTag = Array.from(selectedKeys);
+      const res = await fetch("/api/admin/tag", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ keys: keysToTag, tag: bulkTag }),
+      });
+      if (!res.ok) throw new Error("Failed to tag images");
+      
+      setBulkTag("");
+      setSelectedKeys(new Set()); // Deselect after tagging
+      fetchImages(); // Refresh UI tags
+      setShowTagSuccess(true);
+      setTimeout(() => setShowTagSuccess(false), 3000);
+    } catch (err: any) {
+      alert("Error: " + err.message);
+    } finally {
+      setTagging(false);
+    }
+  };
+
   if (loading && images.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-12 text-zinc-500">
@@ -127,14 +155,30 @@ export function ImageGallery() {
         </div>
         
         {selectedKeys.size > 0 && (
-          <button
-            onClick={handleDelete}
-            disabled={deleting}
-            className="flex items-center gap-2 bg-red-500 hover:bg-red-600 outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none"
-          >
-            {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-            Delete Selected ({selectedKeys.size})
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              type="text"
+              value={bulkTag}
+              onChange={(e) => setBulkTag(e.target.value)}
+              placeholder="Enter tag..."
+              className="px-3 py-2 text-sm rounded-xl border-none bg-zinc-100 dark:bg-zinc-800 ring-1 ring-zinc-200 dark:ring-zinc-700 outline-none focus:ring-2 focus:ring-black w-32 dark:text-zinc-100"
+            />
+            <button
+               onClick={handleBulkTag}
+               disabled={tagging || !bulkTag.trim()}
+               className="bg-black text-white px-4 py-2.5 text-sm rounded-xl font-bold disabled:opacity-50 dark:bg-white dark:text-black shadow-sm"
+            >
+               {tagging ? "..." : "Tag"}
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="flex items-center gap-2 bg-red-500 hover:bg-red-600 outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none"
+            >
+              {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+              Delete ({selectedKeys.size})
+            </button>
+          </div>
         )}
       </div>
 
@@ -153,27 +197,27 @@ export function ImageGallery() {
                 onClick={() => toggleSelect(img.key)}
                 className={`group relative cursor-pointer aspect-square bg-zinc-100 dark:bg-zinc-800 rounded-2xl overflow-hidden ring-4 transition-all duration-200 ${
                   isSelected 
-                    ? "ring-red-500 shadow-md scale-95" 
+                    ? "ring-blue-500 shadow-md scale-95" 
                     : "ring-transparent hover:ring-zinc-300 dark:hover:ring-zinc-700 hover:scale-[1.02]"
                 }`}
               >
                 <img
                   src={img.url}
                   alt={img.key}
-                  className={`w-full h-full object-cover transition-opacity duration-300 ${isSelected ? "opacity-40 grayscale-[50%]" : "opacity-100"}`}
+                  className={`w-full h-full object-cover transition-opacity duration-300 ${isSelected ? "opacity-60 grayscale-[30%]" : "opacity-100"}`}
                   loading="lazy"
                 />
                 
-                <div 
-                  className={`absolute top-2 right-2 p-2 rounded-full backdrop-blur-md transition-all duration-200 shadow-sm ${
-                    isSelected ? "bg-red-500 text-white scale-110" : "bg-black/40 text-white/70 group-hover:bg-black/60 group-hover:text-white group-hover:scale-110"
-                  }`}
-                >
-                  <Trash2 className="w-4 h-4" />
+                <div className="absolute top-2 left-2 flex flex-wrap gap-1 max-w-[90%] z-10 pointer-events-none">
+                  {img.tags?.map(tag => (
+                    <span key={tag} className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md bg-black/60 text-white backdrop-blur-md shadow-sm border border-white/10 truncate">
+                      {tag.replace(/-/g, ' ')}
+                    </span>
+                  ))}
                 </div>
                 
                 {isSelected && (
-                  <div className="absolute inset-0 border-4 border-red-500 rounded-2xl pointer-events-none" />
+                  <div className="absolute inset-0 border-4 border-blue-500 rounded-2xl pointer-events-none" />
                 )}
               </div>
             );
@@ -210,6 +254,17 @@ export function ImageGallery() {
                 Delete
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showTagSuccess && (
+        <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300">
+          <div className="flex items-center gap-3 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-black px-6 py-4 rounded-3xl shadow-2xl ring-1 ring-white/10 dark:ring-black/10">
+            <div className="bg-green-500/20 text-green-500 dark:bg-green-500/30 dark:text-green-600 p-1.5 rounded-full">
+              <Check className="w-5 h-5" />
+            </div>
+            <p className="font-bold text-sm tracking-wide">Tags Applied Successfully</p>
           </div>
         </div>
       )}

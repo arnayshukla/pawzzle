@@ -1,13 +1,24 @@
 import { NextResponse } from 'next/server';
-import { getRandomImage } from '@/lib/r2';
+import { getRandomImage, getRandomImageByCategory } from '@/lib/r2';
 
-export async function GET() {
+export const dynamic = 'force-dynamic';
+
+export async function GET(req: Request) {
   try {
-    const imageData = await getRandomImage();
+    const { searchParams } = new URL(req.url);
+    const category = searchParams.get('category');
+    
+    let imageData;
+    if (category && category !== 'all') {
+      imageData = await getRandomImageByCategory(category);
+    } else {
+      // Fallback to purely random selection from default R2 bucket
+      imageData = await getRandomImage();
+    }
     
     if (!imageData) {
       return NextResponse.json(
-        { error: 'No images available in the pool yet. Admin needs to upload some!' },
+        { error: 'No images available. Admin needs to upload some!' },
         { status: 404 }
       );
     }

@@ -11,6 +11,7 @@ export function Uploader() {
   const [isUploading, setIsUploading] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [fileCategories, setFileCategories] = useState<string[]>([]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -29,6 +30,7 @@ export function Uploader() {
       file.type.startsWith("image/")
     );
     setFiles((prev) => [...prev, ...droppedFiles]);
+    setFileCategories((prev) => [...prev, ...new Array(droppedFiles.length).fill("")]);
     setStatus("idle");
     setMessage("");
   }, []);
@@ -39,6 +41,7 @@ export function Uploader() {
         file.type.startsWith("image/")
       );
       setFiles((prev) => [...prev, ...selectedFiles]);
+      setFileCategories((prev) => [...prev, ...new Array(selectedFiles.length).fill("")]);
       setStatus("idle");
       setMessage("");
     }
@@ -46,6 +49,7 @@ export function Uploader() {
 
   const removeFile = (index: number) => {
     setFiles((prev) => prev.filter((_, i) => i !== index));
+    setFileCategories((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleUpload = async () => {
@@ -66,8 +70,10 @@ export function Uploader() {
         })
       );
 
+      console.log("Starting upload with categories:", fileCategories);
       setMessage("Uploading to storage...");
       const formData = new FormData();
+      formData.append("categories", JSON.stringify(fileCategories));
       compressedFiles.forEach((file, index) => {
         // preserve the original file name because browser-image-compression sometimes renames to 'blob'
         formData.append("files", file, files[index].name);
@@ -81,6 +87,7 @@ export function Uploader() {
       if (!res.ok) throw new Error("Upload failed on the server");
 
       setFiles([]);
+      setFileCategories([]);
       setStatus("success");
       setMessage(`Successfully uploaded ${files.length} image(s)!`);
 
@@ -97,6 +104,7 @@ export function Uploader() {
 
   return (
     <div className="space-y-6">
+
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -140,22 +148,38 @@ export function Uploader() {
             {files.map((file, i) => (
               <li
                 key={i}
-                className="group relative aspect-square overflow-hidden rounded-xl bg-zinc-100 ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-zinc-700"
+                className="group relative flex flex-col overflow-hidden rounded-xl bg-zinc-100 ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-zinc-700 aspect-[4/5]"
               >
-                <img
-                  src={URL.createObjectURL(file)}
-                  alt="Preview"
-                  className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                  onLoad={(e) => URL.revokeObjectURL((e.target as HTMLImageElement).src)}
-                />
-                <button
-                  type="button"
-                  onClick={() => removeFile(i)}
-                  disabled={isUploading}
-                  className="absolute right-2 top-2 rounded-full bg-black/50 p-1.5 text-white backdrop-blur-sm transition-colors hover:bg-red-500"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+                <div className="relative flex-1 bg-black/5 dark:bg-black/20">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt="Preview"
+                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                    onLoad={(e) => URL.revokeObjectURL((e.target as HTMLImageElement).src)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeFile(i)}
+                    disabled={isUploading}
+                    className="absolute right-2 top-2 rounded-full bg-black/50 p-1.5 text-white backdrop-blur-sm transition-colors hover:bg-red-500"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <div className="p-2 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900">
+                  <input
+                    type="text"
+                    value={fileCategories[i]}
+                    onChange={(e) => {
+                      const newCats = [...fileCategories];
+                      newCats[i] = e.target.value;
+                      setFileCategories(newCats);
+                    }}
+                    placeholder="Tag (e.g. funny)"
+                    disabled={isUploading}
+                    className="w-full text-xs px-2 py-1.5 rounded-lg border-none bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-black dark:focus:ring-white outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
+                  />
+                </div>
               </li>
             ))}
           </ul>

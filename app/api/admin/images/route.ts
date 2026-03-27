@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { r2Client, bucketName } from '@/lib/r2';
 import { GetObjectCommand, DeleteObjectsCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { redis } from '@/lib/redis';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,17 +20,36 @@ export async function GET() {
     const listRes = await r2Client.send(listCommand);
     const keys = listRes.Contents?.map(c => c.Key!).filter(Boolean) || [];
     
+    // Fetch all categories and build a reverse map in memory O(C) reads
+    const categories = await redis.smembers('categories');
+    const imageTags = new Map<string, string[]>();
+    
+    if (categories && categories.length > 0) {
+      const p = redis.pipeline();
+      categories.forEach(cat => p.smembers(`category:${cat}`));
+      const categorySets = await p.exec();
+      
+      categories.forEach((cat, index) => {
+        const catKeys = categorySets[index] as string[];
+        if (catKeys && Array.isArray(catKeys)) {
+          catKeys.forEach(key => {
+            if (!imageTags.has(key)) imageTags.set(key, []);
+            imageTags.get(key)!.push(cat);
+          });
+        }
+      });
+    }
+
     // Generate presigned URLs for all images
     const images = await Promise.all(
       keys.map(async (key) => {
         const getCommand = new GetObjectCommand({ Bucket: bucketName, Key: key });
         const url = await getSignedUrl(r2Client, getCommand, { expiresIn: 3600 });
-        return { key, url };
+        return { key, url, tags: imageTags.get(key) || [] };
       })
     );
 
     // Sort by timestamp (reverse chronological so newest are first)
-    // The keys are of the form: images/1774456293837-UUID-file.jpg
     images.sort((a, b) => b.key.localeCompare(a.key));
     
     return NextResponse.json(images);
