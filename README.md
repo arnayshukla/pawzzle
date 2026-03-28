@@ -3,7 +3,7 @@
 Pawzzle is a fun, lightweight weekend hobby project created to turn your favorite dog photos into an engaging "swap-tile" puzzle game! 
 
 ## Why was this created?
-Because who doesn't love looking at cute dogs while giving their brain a tiny workout? It was built over a weekend to experiment with Next.js App Router, Cloudflare R2 storage, and framer-motion animations while producing something genuinely fun to share.
+Because who doesn't love looking at cute dogs while giving their brain a tiny workout? I built Pawzzle purely because I wanted to create a fun, personalized game to showcase and play with my own dog pictures. What started as a lightweight weekend project quickly escalated into a deeply optimized, competitive daily challenge game!
 
 ## Features & Architecture
 
