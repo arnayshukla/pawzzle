@@ -201,6 +201,7 @@ export default function DailyChallengePage() {
               isDaily={true}
               seedDate={seedDate}
               puzzleId={`daily-${seedDate}`}
+              onViewLeaderboard={() => setShowLeaderboard(true)}
             />
           )}
         </div>

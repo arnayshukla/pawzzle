@@ -15,6 +15,7 @@ export function usePuzzleState(isDaily: boolean = false) {
   const [order, setOrder] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [hasStartedMoving, setHasStartedMoving] = useState(false);
   const [isSolved, setIsSolved] = useState(false);
   const [showWinModal, setShowWinModal] = useState(false);
   const [time, setTime] = useState(0); // in seconds
@@ -45,8 +46,9 @@ export function usePuzzleState(isDaily: boolean = false) {
     setIsSolved(false);
     setShowWinModal(false);
     setIsPlaying(true);
+    setHasStartedMoving(false);
     setSelectedTileIndex(null);
-  }, [size]);
+  }, [size, isDaily]);
 
   // Check for win
   useEffect(() => {
@@ -55,6 +57,7 @@ export function usePuzzleState(isDaily: boolean = false) {
       if (isWin) {
         setIsSolved(true);
         setIsPlaying(false);
+        setHasStartedMoving(false);
         playSound('win');
         triggerVibration('success');
         setTimeout(() => setShowWinModal(true), 500);
@@ -64,7 +67,7 @@ export function usePuzzleState(isDaily: boolean = false) {
 
   // Timer
   useEffect(() => {
-    if (isPlaying && !isSolved) {
+    if (isPlaying && hasStartedMoving && !isSolved) {
       timerRef.current = setInterval(() => {
         setTime((prev) => prev + 1);
       }, 1000);
@@ -75,10 +78,12 @@ export function usePuzzleState(isDaily: boolean = false) {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPlaying, isSolved]);
+  }, [isPlaying, hasStartedMoving, isSolved]);
 
   const handleTileClick = (index: number) => {
     if (!isPlaying || isSolved) return;
+    
+    if (!hasStartedMoving) setHasStartedMoving(true);
 
     if (selectedTileIndex === null) {
       setSelectedTileIndex(index);

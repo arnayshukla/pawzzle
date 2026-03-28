@@ -196,6 +196,7 @@ export default function GamePage() {
             onPlayAgain={puzzle.initPuzzle}
             onNewImage={() => fetchNewImage(selectedCategory)}
             puzzleId={`endless-${puzzle.difficulty}`}
+            onViewLeaderboard={() => setShowLeaderboard(true)}
           />
         )}
         </div>
