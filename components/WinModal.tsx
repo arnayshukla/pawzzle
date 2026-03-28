@@ -18,6 +18,7 @@ interface WinModalProps {
   isDaily?: boolean;
   seedDate?: string;
   puzzleId: string;
+  onViewLeaderboard?: () => void;
 }
 
 export function WinModal({
@@ -31,6 +32,7 @@ export function WinModal({
   isDaily,
   seedDate,
   puzzleId,
+  onViewLeaderboard,
 }: WinModalProps) {
   const [enlarged, setEnlarged] = useState(false);
   const [bestMoves, setBestMoves] = useState<number | null>(null);
@@ -197,8 +199,13 @@ export function WinModal({
               {submitError && <p className="text-red-500 text-xs mt-2 font-medium">{submitError}</p>}
             </div>
           ) : (
-             <div className="mb-6 p-4 rounded-2xl bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-900/30 text-green-700 dark:text-green-500 font-bold text-sm text-center">
-               Score successfully submitted!
+             <div className="mb-6 p-4 rounded-2xl bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-900/30 flex flex-col items-center justify-center gap-3">
+               <span className="text-green-700 dark:text-green-500 font-bold text-sm text-center">Score successfully submitted!</span>
+               {onViewLeaderboard && (
+                 <button onClick={onViewLeaderboard} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold transition-all text-sm w-full shadow-sm hover:scale-[1.02] active:scale-95">
+                   View Leaderboard
+                 </button>
+               )}
              </div>
           )}
 
