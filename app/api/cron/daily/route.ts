@@ -39,25 +39,13 @@ export async function GET(req: Request) {
 
         if (!timezone || !subscription) return;
 
-        const nowInTimezone = new Intl.DateTimeFormat('en-US', {
-          timeZone: timezone,
-          hour: 'numeric',
-          minute: 'numeric',
-          hour12: false
-        }).format(new Date()); 
-        
-        const [currentHour, currentMinute] = nowInTimezone.split(':').map(Number);
-        
-        // Match the target hour and allow a 15 min drift (since the cron runs explicitly on the 0 and 30 intervals)
-        const isTargetTime = currentHour === targetHour && Math.abs(currentMinute - targetMinute) <= 15;
-
         const url = new URL(req.url);
         const force = url.searchParams.get('force') === 'true';
 
-        if (isTargetTime || force) {
-          await webpush.sendNotification(subscription, payload);
-          sentCount++;
-        }
+        // Vercel Hobby accounts enforce a max of 1 cron execution per day.
+        // We broadcast to all users simultaneously regardless of their local timezone.
+        await webpush.sendNotification(subscription, payload);
+        sentCount++;
       } catch (err: any) {
         if (err.statusCode === 410 || err.statusCode === 404) {
           // Track stale endpoints to clean up Redis logic
