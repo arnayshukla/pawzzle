@@ -19,6 +19,10 @@ interface WinModalProps {
   seedDate?: string;
   puzzleId: string;
   onViewLeaderboard?: () => void;
+  challengeTime?: number;
+  challengerName?: string;
+  isEndless?: boolean; // Endless puzzles change randomly, they can't be challenged properly without storing the exact image URL context.
+  imageKey?: string | null;
 }
 
 export function WinModal({
@@ -33,6 +37,10 @@ export function WinModal({
   seedDate,
   puzzleId,
   onViewLeaderboard,
+  challengeTime,
+  challengerName,
+  isEndless,
+  imageKey,
 }: WinModalProps) {
   const [enlarged, setEnlarged] = useState(false);
   const [bestMoves, setBestMoves] = useState<number | null>(null);
@@ -46,11 +54,37 @@ export function WinModal({
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
+  // Load cached player name on mount
+  useEffect(() => {
+    const cachedName = localStorage.getItem("pawzzle_player_name");
+    if (cachedName) setPlayerName(cachedName);
+  }, []);
 
+  const safeCopyToClipboard = async (text: string) => {
+    if (navigator?.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      // Fallback for non-HTTPS local network testing
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      textArea.style.top = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand("copy");
+      } catch (error) {
+        console.error("Clipboard fallback failed", error);
+      }
+      textArea.remove();
+    }
+  };
 
-  const handleDailyShare = () => {
+  const handleDailyShare = async () => {
     const text = `Pawzzle Daily 🐾 ${seedDate}\nLevel: ${difficulty}\nMoves: ${moves} | Time: ${time}s\nhttps://pawzzle.arnayshukla.com/daily`;
-    navigator.clipboard.writeText(text);
+    await safeCopyToClipboard(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -71,9 +105,10 @@ export function WinModal({
           puzzleId
         })
       });
-      
       if (!res.ok) throw new Error("Failed to submit score");
       setHasSubmitted(true);
+      // Cache the name for future challenges/leaderboard submissions
+      localStorage.setItem("pawzzle_player_name", playerName.trim());
     } catch (err: any) {
       setSubmitError(err.message || "Could not submit score");
     } finally {
@@ -139,10 +174,16 @@ export function WinModal({
           </div>
           
           <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-2">
-            Pawfect!
+            {challengeTime 
+              ? (time <= challengeTime ? "Challenge Won! 🎉" : "Challenge Lost! 💀")
+              : "Pawfect!"}
           </h2>
           <p className="text-zinc-500 dark:text-zinc-400 mb-6 font-medium">
-            You solved the {difficulty} puzzle.
+            {challengeTime 
+              ? (time <= challengeTime 
+                  ? `You beat ${challengerName ? `${challengerName}'s` : 'the target'} time of ${challengeTime}s!` 
+                  : `You were too slow to beat ${challengeTime}s...`)
+              : `You solved the ${difficulty} puzzle.`}
           </p>
 
           <div
@@ -222,6 +263,28 @@ export function WinModal({
           )}
 
           <div className="flex flex-col gap-3">
+            <button
+              onClick={async () => {
+                const cachedName = localStorage.getItem("pawzzle_player_name");
+                const url = new URL(window.location.href);
+                url.searchParams.set("challengeTime", time.toString());
+                if (cachedName) {
+                  url.searchParams.set("challenger", cachedName);
+                }
+                if (isEndless && imageKey) {
+                  url.searchParams.set("key", imageKey);
+                }
+                const targetText = `Can you beat my time of ${time}s on Pawzzle?\n\n${url.toString()}`;
+                
+                await safeCopyToClipboard(targetText);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              className="flex items-center justify-center gap-2 w-full rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-amber-950 ring-1 ring-amber-400/50 px-4 py-4 text-sm font-bold tracking-wide transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
+            >
+              {copied ? "Copied Challenge Link!" : "Challenge a Friend ⚔️"}
+            </button>
+            
             {isDaily ? (
               <>
                 <button
