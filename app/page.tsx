@@ -14,6 +14,7 @@ import { CustomPackCreator } from "@/components/CustomPackCreator";
 import { X, Camera } from "lucide-react";
 export default function GamePage() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageKey, setImageKey] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -22,6 +23,10 @@ export default function GamePage() {
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [showCustomPackModal, setShowCustomPackModal] = useState(false);
+  
+  // Challenge Mechanics
+  const [challengeTime, setChallengeTime] = useState<number | undefined>();
+  const [challengerName, setChallengerName] = useState<string | undefined>();
   
   const puzzle = usePuzzleState();
 
@@ -39,6 +44,7 @@ export default function GamePage() {
       }
       const data = await res.json();
       setImageUrl(data.url);
+      if (data.key) setImageKey(data.key);
       
       puzzle.initPuzzle();
     } catch (err: any) {
@@ -60,7 +66,32 @@ export default function GamePage() {
     };
     
     fetchCategories();
-    fetchNewImage("all");
+    
+    // Check for Endless Challenge params
+    const params = new URLSearchParams(window.location.search);
+    const ct = params.get("challengeTime");
+    const cn = params.get("challenger");
+    const imgKeyParam = params.get("key");
+
+    if (ct && !isNaN(parseInt(ct))) setChallengeTime(parseInt(ct));
+    if (cn) setChallengerName(cn);
+
+    if (imgKeyParam) {
+      setImageKey(imgKeyParam);
+      // Quickly fetch its dedicated signed URL
+      fetch(`/api/game/image?key=${encodeURIComponent(imgKeyParam)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.url) {
+              setImageUrl(data.url);
+              puzzle.initPuzzle();
+            }
+            setLoading(false);
+        })
+        .catch(() => fetchNewImage("all")); // Fallback if key deleted
+    } else {
+      fetchNewImage("all");
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only on mount
 
@@ -127,7 +158,21 @@ export default function GamePage() {
         </button>
       </div>
 
-      {categories.length > 0 && (
+      {challengeTime && (
+        <div className="mx-auto max-w-xl w-full mb-6">
+          <div className="bg-amber-50 dark:bg-amber-900/10 px-5 py-4 rounded-2xl flex items-center justify-between ring-1 ring-amber-200 dark:ring-amber-900/30 shadow-sm">
+            <div className="flex flex-col">
+              <span className="text-amber-700 dark:text-amber-500 font-bold text-[10px] sm:text-xs tracking-widest uppercase mb-0.5">Active Challenge</span>
+              <span className="text-zinc-900 dark:text-white font-bold text-sm sm:text-base">Beat {challengerName ? `${challengerName}'s` : 'target'} time: <span className="text-amber-600 dark:text-amber-400">{challengeTime}s</span>!</span>
+            </div>
+            <div className="flex bg-amber-100 dark:bg-amber-900/30 h-10 w-10 shrink-0 items-center justify-center rounded-full text-amber-600 dark:text-amber-500">
+               <Trophy className="w-5 h-5" />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {categories.length > 0 && !challengeTime && (
         <div className="w-full max-w-2xl mx-auto mb-4 sm:mb-8 px-4 overflow-hidden">
           <div className="flex items-center gap-2 overflow-x-auto pb-4 scrollbar-hide snap-x" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <button
@@ -218,6 +263,10 @@ export default function GamePage() {
             onNewImage={() => fetchNewImage(selectedCategory)}
             puzzleId={`endless-${puzzle.difficulty}`}
             onViewLeaderboard={() => setShowLeaderboard(true)}
+            isEndless={true}
+            imageKey={imageKey}
+            challengeTime={challengeTime}
+            challengerName={challengerName}
           />
         )}
         </div>

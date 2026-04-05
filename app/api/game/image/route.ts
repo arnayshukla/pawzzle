@@ -7,7 +7,22 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const category = searchParams.get('category');
+    const specificKey = searchParams.get('key');
     
+    // Allow secure direct signing for Endless Mode challenge sharing
+    if (specificKey && specificKey.startsWith('images/')) {
+      const { bucketName, r2Client } = await import('@/lib/r2');
+      const { GetObjectCommand } = await import('@aws-sdk/client-s3');
+      const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');
+      
+      const getCommand = new GetObjectCommand({
+        Bucket: bucketName,
+        Key: specificKey,
+      });
+      const url = await getSignedUrl(r2Client, getCommand, { expiresIn: 900 });
+      return NextResponse.json({ key: specificKey, url });
+    }
+
     let imageData;
     if (category && category !== 'all') {
       imageData = await getRandomImageByCategory(category);

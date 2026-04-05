@@ -23,6 +23,19 @@ export default function DailyChallengePage() {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [shareText, setShareText] = useState("Share Challenge");
 
+  // Challenge Mechanics
+  const [challengeTime, setChallengeTime] = useState<number | undefined>();
+  const [challengerName, setChallengerName] = useState<string | undefined>();
+
+  useEffect(() => {
+    // Parse challenge parameters strictly on the client to avoid SSR hydration mismatches
+    const params = new URLSearchParams(window.location.search);
+    const ct = params.get("challengeTime");
+    const cn = params.get("challenger");
+    if (ct && !isNaN(parseInt(ct))) setChallengeTime(parseInt(ct));
+    if (cn) setChallengerName(cn);
+  }, []);
+
   const fetchDailyImage = async () => {
     setLoading(true);
     setError(null);
@@ -82,6 +95,20 @@ export default function DailyChallengePage() {
         <ArrowLeft className="w-5 h-5" />
         <span className="hidden sm:inline">Back</span>
       </Link>
+
+      {challengeTime && (
+        <div className="mx-auto max-w-xl w-full mb-6">
+          <div className="bg-amber-50 dark:bg-amber-900/10 px-5 py-4 rounded-2xl flex items-center justify-between ring-1 ring-amber-200 dark:ring-amber-900/30 shadow-sm">
+            <div className="flex flex-col">
+              <span className="text-amber-700 dark:text-amber-500 font-bold text-[10px] sm:text-xs tracking-widest uppercase mb-0.5">Active Challenge</span>
+              <span className="text-zinc-900 dark:text-white font-bold text-sm sm:text-base">Beat {challengerName ? `${challengerName}'s` : 'target'} time: <span className="text-amber-600 dark:text-amber-400">{challengeTime}s</span>!</span>
+            </div>
+            <div className="flex bg-amber-100 dark:bg-amber-900/30 h-10 w-10 shrink-0 items-center justify-center rounded-full text-amber-600 dark:text-amber-500">
+               <Trophy className="w-5 h-5" />
+            </div>
+          </div>
+        </div>
+      )}
 
       <h1 className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center text-4xl font-black tracking-tighter text-amber-500 dark:text-amber-400 mb-6 select-none">
         <img src="/logo.png" alt="Pawzzle Logo" className="w-12 h-12 rounded-xl ring-2 ring-amber-400" />
@@ -209,6 +236,8 @@ export default function DailyChallengePage() {
               seedDate={seedDate}
               puzzleId={`daily-${seedDate}`}
               onViewLeaderboard={() => setShowLeaderboard(true)}
+              challengeTime={challengeTime}
+              challengerName={challengerName}
             />
           )}
         </div>

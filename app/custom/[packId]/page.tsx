@@ -5,7 +5,7 @@ import { usePuzzleState } from "@/hooks/usePuzzleState";
 import { PuzzleBoard } from "@/components/PuzzleBoard";
 import { HUD } from "@/components/HUD";
 import { WinModal } from "@/components/WinModal";
-import { Loader2, ImageOff, ShieldAlert } from "lucide-react";
+import { Loader2, ImageOff, ShieldAlert, Trophy } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -19,6 +19,19 @@ export default function CustomGamePage() {
   const [isFlagged, setIsFlagged] = useState(false);
   const [reportState, setReportState] = useState<'idle' | 'reporting' | 'reported'>('idle');
   
+  // Challenge Mechanics
+  const [challengeTime, setChallengeTime] = useState<number | undefined>();
+  const [challengerName, setChallengerName] = useState<string | undefined>();
+
+  useEffect(() => {
+    // Parse challenge parameters strictly on the client to avoid SSR hydration mismatches
+    const params = new URLSearchParams(window.location.search);
+    const ct = params.get("challengeTime");
+    const cn = params.get("challenger");
+    if (ct && !isNaN(parseInt(ct))) setChallengeTime(parseInt(ct));
+    if (cn) setChallengerName(cn);
+  }, []);
+
   const puzzle = usePuzzleState();
 
   const fetchNewImage = async () => {
@@ -91,6 +104,20 @@ export default function CustomGamePage() {
         Pawzzle.
       </h1>
 
+      {challengeTime && (
+        <div className="mx-auto max-w-xl w-full mb-6 px-4">
+          <div className="bg-amber-50 dark:bg-amber-900/10 px-5 py-4 rounded-2xl flex items-center justify-between ring-1 ring-amber-200 dark:ring-amber-900/30 shadow-sm text-left">
+            <div className="flex flex-col">
+              <span className="text-amber-700 dark:text-amber-500 font-bold text-[10px] sm:text-xs tracking-widest uppercase mb-0.5">Active Challenge</span>
+              <span className="text-zinc-900 dark:text-white font-bold text-sm sm:text-base">Beat {challengerName ? `${challengerName}'s` : 'target'} time: <span className="text-amber-600 dark:text-amber-400">{challengeTime}s</span>!</span>
+            </div>
+            <div className="flex bg-amber-100 dark:bg-amber-900/30 h-10 w-10 shrink-0 items-center justify-center rounded-full text-amber-600 dark:text-amber-500">
+               <Trophy className="w-5 h-5" />
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 px-4 w-full max-w-xl mx-auto text-center">
         <Link 
           href="/" 
@@ -160,6 +187,8 @@ export default function CustomGamePage() {
               onNewImage={fetchNewImage}
               puzzleId={`custom-${packId}`}
               onViewLeaderboard={() => {}}
+              challengeTime={challengeTime}
+              challengerName={challengerName}
             />
           )}
 
