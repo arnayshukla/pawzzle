@@ -10,7 +10,8 @@ import Link from "next/link";
 import { Leaderboard } from "@/components/Leaderboard";
 import { AnimatePresence } from "framer-motion";
 import { PushSubscriber } from "@/components/PushSubscriber";
-
+import { CustomPackCreator } from "@/components/CustomPackCreator";
+import { X, Camera } from "lucide-react";
 export default function GamePage() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -20,6 +21,7 @@ export default function GamePage() {
   
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [showCustomPackModal, setShowCustomPackModal] = useState(false);
   
   const puzzle = usePuzzleState();
 
@@ -72,45 +74,57 @@ export default function GamePage() {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black font-sans flex flex-col pt-12 p-4 sm:p-8 pb-24 sm:pb-32">
-      <h1 className="flex items-center justify-center gap-4 text-center text-4xl font-black tracking-tighter text-zinc-900 dark:text-white mb-4 select-none">
-        <img src="/logo.png" alt="Pawzzle Logo" className="w-12 h-12 rounded-xl ring-2 ring-zinc-900 dark:ring-white" />
-        Pawzzle.
-      </h1>
+      <header className="flex items-center justify-between w-full max-w-2xl mx-auto mb-8 px-4">
+        <h1 className="flex items-center gap-3 text-2xl sm:text-3xl font-black tracking-tighter text-zinc-900 dark:text-white select-none">
+          <img src="/logo.png" alt="Pawzzle Logo" className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl ring-2 ring-zinc-900 dark:ring-white shadow-sm" />
+          <span className="hidden min-[380px]:inline">Pawzzle.</span>
+        </h1>
+        
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <button 
+            onClick={() => {
+              navigator.clipboard.writeText("Play Pawzzle: a daily sliding puzzle game!\n\nhttps://pawzzle.arnayshukla.com");
+              setShareText("Copied!");
+              setTimeout(() => setShareText("Share Game"), 2000);
+            }}
+            className={`flex shrink-0 w-11 h-11 sm:w-12 sm:h-12 items-center justify-center font-bold rounded-2xl shadow-sm ring-1 transition-all hover:scale-105 active:scale-95 ${
+              shareText === "Copied!" 
+                ? "bg-green-500 text-white ring-green-600" 
+                : "bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 ring-blue-200 dark:ring-blue-800"
+            }`}
+            title="Share Game"
+          >
+            {shareText === "Copied!" ? <Check className="w-4 h-4 sm:w-5 sm:h-5" /> : <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />}
+          </button>
+          
+          <div className="transform scale-[0.85] sm:scale-100 origin-right">
+            <PushSubscriber />
+          </div>
+        </div>
+      </header>
 
-      <div className="flex flex-row items-center justify-center gap-2 sm:gap-3 mb-8 px-4 w-full max-w-xl mx-auto">
+      <div className="flex flex-wrap items-center justify-center gap-3 mb-8 px-4 w-full max-w-3xl mx-auto">
         <Link 
           href="/daily" 
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 h-[52px] sm:h-14 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-amber-950 font-bold rounded-2xl shadow-md ring-1 ring-amber-400/50 transition-all hover:scale-105 active:scale-95 text-[15px] sm:text-base whitespace-nowrap"
+          className="flex-auto min-w-[200px] flex items-center justify-center gap-2 px-5 py-3.5 h-[52px] sm:h-14 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-amber-950 font-bold rounded-2xl shadow-md ring-1 ring-amber-400/50 transition-all hover:scale-105 active:scale-95 text-[15px] sm:text-base whitespace-nowrap"
         >
           <Calendar className="w-5 h-5 hidden sm:block" />
           Daily Challenge
         </Link>
-
+        <button 
+          onClick={() => setShowCustomPackModal(true)}
+          className="flex-auto min-w-[200px] flex items-center justify-center gap-2 px-5 py-3.5 h-[52px] sm:h-14 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700 transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
+        >
+          <Camera className="w-5 h-5 text-amber-500" />
+          <span className="text-[15px] sm:text-base">Create Your Pawzzle</span>
+        </button>
         <button 
           onClick={() => setShowLeaderboard(true)}
-          className="flex shrink-0 w-[52px] h-[52px] sm:w-14 sm:h-14 items-center justify-center bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700 transition-all hover:scale-105 active:scale-95"
-          title="Leaderboard"
+          className="flex-auto min-w-[200px] flex items-center justify-center gap-2 px-5 py-3.5 h-[52px] sm:h-14 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700 transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
         >
           <Trophy className="w-5 h-5 text-amber-500" />
+          <span className="text-[15px] sm:text-base">Leaderboard</span>
         </button>
-
-        <button 
-          onClick={() => {
-            navigator.clipboard.writeText("Play Pawzzle: a daily sliding puzzle game!\n\nhttps://pawzzle.arnayshukla.com");
-            setShareText("Copied!");
-            setTimeout(() => setShareText("Share Game"), 2000);
-          }}
-          className={`flex shrink-0 w-[52px] h-[52px] sm:w-14 sm:h-14 items-center justify-center font-bold rounded-2xl shadow-sm ring-1 transition-all hover:scale-105 active:scale-95 ${
-            shareText === "Copied!" 
-              ? "bg-green-500 text-white ring-green-600" 
-              : "bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 ring-blue-200 dark:ring-blue-800"
-          }`}
-          title="Share Game"
-        >
-          {shareText === "Copied!" ? <Check className="w-5 h-5" /> : <Share2 className="w-5 h-5" />}
-        </button>
-        
-        <PushSubscriber />
       </div>
 
       {categories.length > 0 && (
@@ -215,6 +229,26 @@ export default function GamePage() {
             puzzleId={`endless-${puzzle.difficulty}`} 
             onClose={() => setShowLeaderboard(false)} 
           />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showCustomPackModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <div 
+              className="absolute inset-0" 
+              onClick={() => setShowCustomPackModal(false)}
+            />
+            <div className="relative z-10 w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
+              <button
+                onClick={() => setShowCustomPackModal(false)}
+                className="absolute -top-12 right-0 md:-right-12 p-2 bg-zinc-800 text-white hover:bg-zinc-700 rounded-full transition-all"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <CustomPackCreator />
+            </div>
+          </div>
         )}
       </AnimatePresence>
 
