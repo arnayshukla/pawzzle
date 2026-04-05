@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Trophy, RefreshCcw, Image as ImageIcon, ZoomIn, X } from "lucide-react";
+import { Trophy, RefreshCcw, Image as ImageIcon, ZoomIn, X, Download } from "lucide-react";
 import confetti from "canvas-confetti";
 import { Difficulty } from "@/hooks/usePuzzleState";
 import { motion, AnimatePresence } from "framer-motion";
@@ -45,6 +45,8 @@ export function WinModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState("");
+
+
 
   const handleDailyShare = () => {
     const text = `Pawzzle Daily 🐾 ${seedDate}\nLevel: ${difficulty}\nMoves: ${moves} | Time: ${time}s\nhttps://pawzzle.arnayshukla.com/daily`;
@@ -152,6 +154,16 @@ export function WinModal({
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center transition-colors duration-300">
                <ZoomIn className="text-white opacity-0 group-hover:opacity-100 drop-shadow-lg w-8 h-8 transition-opacity duration-300 scale-75 group-hover:scale-100" />
             </div>
+            
+            <a 
+              href={`/api/download?url=${encodeURIComponent(imageUrl)}`}
+              download="pawzzle.jpg"
+              onClick={(e) => e.stopPropagation()}
+              className="absolute top-2 right-2 p-2 bg-black/40 hover:bg-black/60 rounded-full text-white backdrop-blur-sm transition-all z-10 hover:scale-110 active:scale-95"
+              title="Download Image"
+            >
+              <Download className="w-4 h-4" />
+            </a>
           </div>
 
           <div className="grid grid-cols-2 gap-4 mb-6 sm:mb-8">
@@ -263,13 +275,24 @@ export function WinModal({
               >
                 <X className="w-6 h-6 sm:w-8 sm:h-8" />
               </button>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img 
-                src={imageUrl} 
-                alt="Enlarged solved puzzle" 
-                className="max-w-full max-h-full object-contain rounded-lg shadow-2xl" 
-                onClick={(e) => e.stopPropagation()}
-              />
+              <div className="relative">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img 
+                  src={imageUrl} 
+                  alt="Enlarged solved puzzle" 
+                  className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl" 
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <a 
+                  href={`/api/download?url=${encodeURIComponent(imageUrl)}`}
+                  download="pawzzle.jpg"
+                  className="absolute bottom-4 right-4 bg-black/60 hover:bg-black/80 p-3 rounded-full text-white backdrop-blur-sm transition-all hover:scale-110 active:scale-95 shadow-md flex items-center gap-2"
+                  onClick={(e) => e.stopPropagation()}
+                  title="Download High-Res Image"
+                >
+                  <Download className="w-5 h-5" />
+                </a>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

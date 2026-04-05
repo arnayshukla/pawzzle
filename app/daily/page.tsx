@@ -5,10 +5,11 @@ import { usePuzzleState } from "@/hooks/usePuzzleState";
 import { PuzzleBoard } from "@/components/PuzzleBoard";
 import { HUD } from "@/components/HUD";
 import { WinModal } from "@/components/WinModal";
-import { Loader2, ImageOff, ArrowLeft, Trophy, Share2 } from "lucide-react";
+import { Loader2, ImageOff, ArrowLeft, Trophy, Share2, Check } from "lucide-react";
 import Link from "next/link";
 import { AnimatePresence } from "framer-motion";
 import { Leaderboard } from "@/components/Leaderboard";
+import { PushSubscriber } from "@/components/PushSubscriber";
 
 export default function DailyChallengePage() {
   const puzzle = usePuzzleState(true); // isDaily = true
@@ -87,10 +88,10 @@ export default function DailyChallengePage() {
         Daily Canine
       </h1>
 
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8 px-4 w-full max-w-3xl mx-auto">
+      <div className="flex flex-row items-center justify-center gap-2 sm:gap-3 mb-8 px-4 w-full max-w-xl mx-auto">
         <Link 
           href="/" 
-          className="flex items-center justify-center gap-2 px-6 py-3.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-2xl shadow-md transition-all hover:scale-105 active:scale-95 text-sm sm:text-base w-full sm:w-[210px]"
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 h-[52px] sm:h-14 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-2xl shadow-md transition-all hover:scale-105 active:scale-95 text-[15px] sm:text-base whitespace-nowrap"
         >
           Endless Mode
         </Link>
@@ -98,10 +99,10 @@ export default function DailyChallengePage() {
         {seedDate && (
           <button 
             onClick={() => setShowLeaderboard(true)}
-            className="flex items-center justify-center gap-2 px-6 py-3.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700 transition-all hover:scale-105 active:scale-95 text-sm sm:text-base w-full sm:w-[210px]"
+            className="flex shrink-0 w-[52px] h-[52px] sm:w-14 sm:h-14 items-center justify-center bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700 transition-all hover:scale-105 active:scale-95"
+            title="Leaderboard"
           >
             <Trophy className="w-5 h-5 text-amber-500" />
-            Leaderboard
           </button>
         )}
 
@@ -111,11 +112,17 @@ export default function DailyChallengePage() {
             setShareText("Copied!");
             setTimeout(() => setShareText("Share Challenge"), 2000);
           }}
-          className="flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 font-bold rounded-2xl shadow-sm ring-1 ring-blue-200 dark:ring-blue-800 transition-all hover:scale-105 active:scale-95 text-sm sm:text-base w-full sm:w-[210px]"
+          className={`flex shrink-0 w-[52px] h-[52px] sm:w-14 sm:h-14 items-center justify-center font-bold rounded-2xl shadow-sm ring-1 transition-all hover:scale-105 active:scale-95 ${
+            shareText === "Copied!" 
+              ? "bg-green-500 text-white ring-green-600" 
+              : "bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 ring-blue-200 dark:ring-blue-800"
+          }`}
+          title="Share Challenge"
         >
-          <Share2 className="w-5 h-5" />
-          {shareText}
+          {shareText === "Copied!" ? <Check className="w-5 h-5" /> : <Share2 className="w-5 h-5" />}
         </button>
+
+        <PushSubscriber />
       </div>
 
       {loading ? (

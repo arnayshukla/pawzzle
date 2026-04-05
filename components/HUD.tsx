@@ -34,11 +34,7 @@ export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImag
       </div>
 
       <div className="flex items-center gap-2">
-        {isDaily ? (
-          <div className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 px-4 py-2.5 rounded-xl font-bold text-sm tracking-wide flex items-center justify-center border border-amber-200 dark:border-amber-700/50 mr-2 shadow-sm">
-            Canine Challenge
-          </div>
-        ) : (
+        {!isDaily && (
           <select
             value={difficulty}
             onChange={(e) => setDifficulty(e.target.value as Difficulty)}
