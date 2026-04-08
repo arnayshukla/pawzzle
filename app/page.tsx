@@ -295,6 +295,12 @@ export default function GamePage() {
             setDifficulty={puzzle.setDifficulty}
             onReset={puzzle.initPuzzle}
             onNewImage={() => fetchNewImage(selectedCategory)}
+            showNumbers={puzzle.showNumbers}
+            useHint={puzzle.useHint}
+            isBlindMode={puzzle.isBlindMode}
+            setIsBlindMode={puzzle.setIsBlindMode}
+            isPlaying={puzzle.isPlaying}
+            isSolved={puzzle.isSolved}
           />
           
           {imageUrl && puzzle.order.length > 0 && (
@@ -307,6 +313,9 @@ export default function GamePage() {
                 handleTileClick={puzzle.handleTileClick}
                 imageUrl={imageUrl}
                 isSolved={puzzle.isSolved}
+                showNumbers={puzzle.showNumbers}
+                blindState={puzzle.blindState}
+                blindCountdown={puzzle.blindCountdown}
               />
             </div>
           )}

@@ -22,6 +22,7 @@ export default function DailyChallengePage() {
   const [copied, setCopied] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [shareText, setShareText] = useState("Share Challenge");
+  const [streak, setStreak] = useState(0);
 
   // Challenge Mechanics
   const [challengeTime, setChallengeTime] = useState<number | undefined>();
@@ -38,6 +39,10 @@ export default function DailyChallengePage() {
     if (diff && ["easy", "medium", "hard"].includes(diff)) {
       puzzle.setDifficulty(diff as any);
     }
+    
+    // Load existing streak
+    const cachedStreak = localStorage.getItem('pawzzle_streak');
+    if (cachedStreak) setStreak(parseInt(cachedStreak));
   }, []);
 
   const fetchDailyImage = async () => {
@@ -98,6 +103,31 @@ export default function DailyChallengePage() {
         time: puzzle.time
       }));
       setHasPlayedToday(true);
+
+      // Streak tracking
+      const todayDate = new Date(seedDate);
+      const lastWinString = localStorage.getItem('pawzzle_last_win');
+      const streakStr = localStorage.getItem('pawzzle_streak');
+      let currentStreak = parseInt(streakStr || '0');
+      
+      if (lastWinString) {
+        const lastWin = new Date(lastWinString);
+        // Compare midnight to midnight differences to avoid daylight saving time offset bugs
+        const diffTime = Math.abs(todayDate.getTime() - lastWin.getTime());
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 1) {
+          currentStreak++;
+        } else if (diffDays > 1) {
+          currentStreak = 1;
+        }
+      } else {
+        currentStreak = 1;
+      }
+      
+      localStorage.setItem('pawzzle_last_win', seedDate);
+      localStorage.setItem('pawzzle_streak', currentStreak.toString());
+      setStreak(currentStreak);
     }
   }, [puzzle.isSolved, seedDate, puzzle.moves, puzzle.time, hasPlayedToday]);
 
@@ -122,9 +152,16 @@ export default function DailyChallengePage() {
         </div>
       )}
 
-      <h1 className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center text-4xl font-black tracking-tighter text-amber-500 dark:text-amber-400 mb-6 select-none">
+      <h1 className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center text-4xl font-black tracking-tighter text-amber-500 dark:text-amber-400 mb-6 select-none relative">
         <img src="/logo.png" alt="Pawzzle Logo" className="w-12 h-12 rounded-xl ring-2 ring-amber-400" />
-        Daily Canine
+        <div className="flex items-center gap-2">
+          Daily Canine
+          {streak >= 3 && (
+            <span title={`${streak} Day Streak!`} className="flex items-center gap-1 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-lg sm:text-lg font-bold px-3 py-1 rounded-xl ring-1 ring-orange-200 dark:ring-orange-800 shadow-sm animate-pulse">
+              {streak} <span className="text-xl">🔥</span>
+            </span>
+          )}
+        </div>
       </h1>
 
       <div className="flex flex-row items-center justify-center gap-2 sm:gap-3 mb-8 px-4 w-full max-w-xl mx-auto">

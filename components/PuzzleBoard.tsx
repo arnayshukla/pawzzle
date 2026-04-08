@@ -13,6 +13,11 @@ interface PuzzleBoardProps {
   handleTileClick: (index: number) => void;
   imageUrl: string;
   isSolved: boolean;
+  
+  // Mechanics
+  showNumbers?: boolean;
+  blindState?: 'idle' | 'preview' | 'playing';
+  blindCountdown?: number | null;
 }
 
 export function PuzzleBoard({
@@ -23,6 +28,9 @@ export function PuzzleBoard({
   handleTileClick,
   imageUrl,
   isSolved,
+  showNumbers,
+  blindState,
+  blindCountdown,
 }: PuzzleBoardProps) {
   const [isPeeking, setIsPeeking] = useState(false);
 
@@ -68,25 +76,58 @@ export function PuzzleBoard({
               !isSolved && "hover:opacity-90"
             )}
             style={{
-              backgroundImage: `url(${imageUrl})`,
+              backgroundImage: (blindState === 'playing' && !isSolved) ? 'none' : `url(${imageUrl})`,
               backgroundSize: `${cols * 100}% ${rows * 100}%`,
               backgroundPosition: `${bgPosX}% ${bgPosY}%`,
             }}
-          />
+          >
+            {showNumbers && (blindState !== 'preview' && blindState !== 'idle') && (
+              <span className="absolute top-1 left-1.5 text-[10px] sm:text-xs font-black text-white mix-blend-difference drop-shadow-md opacity-90">
+                {tileId + 1}
+              </span>
+            )}
+          </motion.div>
         );
       })}
       </div>
 
-      {/* Peek image overlay */}
-      {isPeeking && !isSolved && (
-        <div 
-          className="absolute inset-0 z-20 rounded-2xl bg-cover bg-center shadow-inner pointer-events-none" 
-          style={{ backgroundImage: `url(${imageUrl})` }} 
-        />
+      {/* Peek or Blind Preview Overlay */}
+      {(isPeeking || blindState === 'idle' || blindState === 'preview') && !isSolved && (
+        <div className="absolute inset-0 z-20 rounded-2xl overflow-hidden pointer-events-none shadow-inner bg-zinc-200 dark:bg-zinc-800" style={{ backgroundImage: `url(${imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+          {/* Tiled Grid lines overlay */}
+          <div className="w-full h-full" style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }}>
+            {Array.from({length: rows * cols}).map((_, i) => (
+              <div key={i} className="border border-white/20 ring-1 ring-black/5" />
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Blind Countdown Overlay Text */}
+      {blindState === 'preview' && blindCountdown !== null && (
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/50 rounded-2xl pointer-events-none backdrop-blur-[2px]">
+           <span className="text-white text-6xl sm:text-7xl font-black drop-shadow-2xl animate-pulse">
+             {blindCountdown}
+           </span>
+           <span className="text-white/90 font-bold mt-4 text-xs sm:text-sm uppercase tracking-widest drop-shadow-md">Memorize carefully...</span>
+        </div>
+      )}
+
+      {/* Start Blind Overlay Text */}
+      {blindState === 'idle' && !isSolved && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/40 hover:bg-black/20 rounded-2xl backdrop-blur-[2px] transition-all cursor-pointer group"
+             onClick={() => handleTileClick(0)} // Triggers the start!
+        >
+           <div className="bg-white/10 px-6 py-4 rounded-2xl backdrop-blur-md ring-1 ring-white/20 shadow-2xl pointer-events-none group-hover:scale-105 transition-transform">
+             <span className="text-white text-lg sm:text-xl font-black drop-shadow-md">
+               Click to Start Blind Preview
+             </span>
+           </div>
+        </div>
       )}
 
       {/* Peek Button Container */}
-      {!isSolved && (
+      {!isSolved && blindState !== 'idle' && blindState !== 'preview' && blindState !== 'playing' && (
         <button 
           className="absolute -top-3 -right-3 sm:-right-4 sm:-top-4 z-30 p-2.5 sm:p-3 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 shadow-xl ring-1 ring-black/10 dark:ring-white/10 rounded-full text-zinc-700 dark:text-zinc-300 transition-transform active:scale-95 cursor-help"
           onPointerDown={(e) => { e.preventDefault(); setIsPeeking(true); }}

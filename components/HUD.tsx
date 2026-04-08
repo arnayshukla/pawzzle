@@ -11,9 +11,17 @@ interface HUDProps {
   onReset: () => void;
   onNewImage: () => void;
   isDaily?: boolean;
+
+  // Mechanics
+  showNumbers?: boolean;
+  useHint?: () => void;
+  isBlindMode?: boolean;
+  setIsBlindMode?: (b: boolean) => void;
+  isPlaying?: boolean;
+  isSolved?: boolean;
 }
 
-export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImage, isDaily }: HUDProps) {
+export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImage, isDaily, showNumbers, useHint, isBlindMode, setIsBlindMode, isPlaying, isSolved }: HUDProps) {
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -33,7 +41,37 @@ export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImag
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
+        {/* Mechanics Container */}
+        {useHint && setIsBlindMode && !isDaily && (
+          <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 rounded-xl p-1 shadow-inner mr-2 sm:mr-4">
+            <button
+              onClick={() => setIsBlindMode(!isBlindMode)}
+              disabled={isPlaying} // Can only toggle before game starts
+              className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${
+                isBlindMode 
+                  ? "bg-black text-white dark:bg-white dark:text-black shadow-md" 
+                  : "text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+              } ${isPlaying ? "opacity-30 cursor-not-allowed" : ""}`}
+              title="Blind Mode: Image disappears automatically!"
+            >
+              Blind
+            </button>
+            <button
+              onClick={useHint}
+              disabled={!isPlaying || isSolved || showNumbers || isBlindMode}
+              className={`px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                showNumbers 
+                  ? "bg-amber-500 text-white shadow-md cursor-default" 
+                  : "text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-amber-100 dark:hover:bg-amber-900/30"
+              } ${(!isPlaying || isSolved || showNumbers || isBlindMode) ? "opacity-30 cursor-not-allowed" : ""}`}
+              title="Penalty Hint: Show numbers (+15s penalty)"
+            >
+              Hint <span className="opacity-70 text-[10px]">+15s</span>
+            </button>
+          </div>
+        )}
+
         {!isDaily && (
           <select
             value={difficulty}
