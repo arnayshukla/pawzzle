@@ -155,6 +155,7 @@ export function usePuzzleState(isDaily: boolean = false) {
     isSolved,
     showWinModal,
     isPlaying,
+    hasStartedMoving,
     selectedTileIndex,
     handleTileClick,
     initPuzzle,
@@ -165,8 +166,10 @@ export function usePuzzleState(isDaily: boolean = false) {
     useHint: () => {
       if (!isPlaying || isSolved || showNumbers) return;
       setShowNumbers(true);
-      setTime(t => t + 15);
+      const penalty = parseInt(process.env.NEXT_PUBLIC_HINT_PENALTY_SECONDS || '5');
+      setTime(t => t + penalty);
     },
+    hintPenaltyAmount: parseInt(process.env.NEXT_PUBLIC_HINT_PENALTY_SECONDS || '5'),
     isBlindMode,
     setIsBlindMode,
     blindState,

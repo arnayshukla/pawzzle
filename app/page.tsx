@@ -297,9 +297,11 @@ export default function GamePage() {
             onNewImage={() => fetchNewImage(selectedCategory)}
             showNumbers={puzzle.showNumbers}
             useHint={puzzle.useHint}
+            hintPenaltyAmount={puzzle.hintPenaltyAmount}
             isBlindMode={puzzle.isBlindMode}
             setIsBlindMode={puzzle.setIsBlindMode}
             isPlaying={puzzle.isPlaying}
+            hasStartedMoving={puzzle.hasStartedMoving}
             isSolved={puzzle.isSolved}
           />
           
