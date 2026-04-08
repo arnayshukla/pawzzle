@@ -30,26 +30,73 @@ export default function GamePage() {
   
   const puzzle = usePuzzleState();
 
+  const clearChallengeState = () => {
+    if (challengeTime !== undefined) {
+      setChallengeTime(undefined);
+      setChallengerName(undefined);
+      const url = new URL(window.location.href);
+      url.searchParams.delete("challengeTime");
+      url.searchParams.delete("challenger");
+      url.searchParams.delete("key");
+      url.searchParams.delete("diff");
+      window.history.replaceState({}, '', url.toString());
+    }
+  };
+
   const fetchNewImage = async (categoryToFetch = selectedCategory) => {
     setLoading(true);
     setError(null);
     puzzle.setIsPlaying(false);
+    clearChallengeState();
     
     try {
-      const url = categoryToFetch === "all" ? "/api/game/image" : `/api/game/image?category=${categoryToFetch}`;
-      const res = await fetch(url);
+      // Round Robin Queue Logic
+      let queueStr = sessionStorage.getItem(`pawzzle_queue_${categoryToFetch}`);
+      let queue: string[] = queueStr ? JSON.parse(queueStr) : [];
+      
+      if (queue.length === 0) {
+        // Fetch fresh list of all keys
+        const listUrl = categoryToFetch === "all" ? "/api/game/image/list" : `/api/game/image/list?category=${categoryToFetch}`;
+        const listRes = await fetch(listUrl);
+        if (!listRes.ok) throw new Error("Failed to fetch image list");
+        const listData = await listRes.json();
+        
+        queue = listData.keys;
+        // Fisher-Yates Shuffle
+        for (let i = queue.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [queue[i], queue[j]] = [queue[j], queue[i]];
+        }
+      }
+      
+      const nextKey = queue.pop();
+      sessionStorage.setItem(`pawzzle_queue_${categoryToFetch}`, JSON.stringify(queue));
+      
+      if (!nextKey) throw new Error("No images available");
+
+      // Secure payload using proxy
+      const res = await fetch(`/api/game/image?key=${encodeURIComponent(nextKey)}`);
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || "Failed to fetch image");
       }
       const data = await res.json();
-      setImageUrl(data.url);
+      
       if (data.key) setImageKey(data.key);
       
-      puzzle.initPuzzle();
+      const img = new Image();
+      img.src = data.url;
+      img.onload = () => {
+        setImageUrl(data.url);
+        puzzle.initPuzzle();
+        setLoading(false);
+      };
+      img.onerror = () => {
+        setError("Failed to load image");
+        setLoading(false);
+      };
     } catch (err: any) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   };
@@ -73,8 +120,14 @@ export default function GamePage() {
     const cn = params.get("challenger");
     const imgKeyParam = params.get("key");
 
+    const diff = params.get("diff");
+
     if (ct && !isNaN(parseInt(ct))) setChallengeTime(parseInt(ct));
     if (cn) setChallengerName(cn);
+
+    if (diff && ["easy", "medium", "hard"].includes(diff)) {
+      puzzle.setDifficulty(diff as any);
+    }
 
     if (imgKeyParam) {
       setImageKey(imgKeyParam);
@@ -83,10 +136,17 @@ export default function GamePage() {
         .then(res => res.json())
         .then(data => {
             if (data.url) {
-              setImageUrl(data.url);
-              puzzle.initPuzzle();
+              const img = new Image();
+              img.src = data.url;
+              img.onload = () => {
+                setImageUrl(data.url);
+                puzzle.initPuzzle();
+                setLoading(false);
+              };
+              img.onerror = () => fetchNewImage("all");
+            } else {
+              fetchNewImage("all");
             }
-            setLoading(false);
         })
         .catch(() => fetchNewImage("all")); // Fallback if key deleted
     } else {

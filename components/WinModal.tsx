@@ -274,6 +274,7 @@ export function WinModal({
                 if (isEndless && imageKey) {
                   url.searchParams.set("key", imageKey);
                 }
+                url.searchParams.set("diff", difficulty);
                 const targetText = `Can you beat my time of ${time}s on Pawzzle?\n\n${url.toString()}`;
                 
                 await safeCopyToClipboard(targetText);

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Eye } from "lucide-react";
+import { Image as ImageIcon } from "lucide-react";
 
 interface PuzzleBoardProps {
   rows: number;
@@ -95,7 +95,7 @@ export function PuzzleBoard({
           onContextMenu={(e) => e.preventDefault()}
           title="Hold to peek at original image"
         >
-          <Eye className="w-5 h-5 sm:w-6 sm:h-6" />
+          <ImageIcon className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
       )}
     </div>
