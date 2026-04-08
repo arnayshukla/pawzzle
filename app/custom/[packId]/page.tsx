@@ -28,8 +28,12 @@ export default function CustomGamePage() {
     const params = new URLSearchParams(window.location.search);
     const ct = params.get("challengeTime");
     const cn = params.get("challenger");
+    const diff = params.get("diff");
     if (ct && !isNaN(parseInt(ct))) setChallengeTime(parseInt(ct));
     if (cn) setChallengerName(cn);
+    if (diff && ["easy", "medium", "hard"].includes(diff)) {
+      puzzle.setDifficulty(diff as any);
+    }
   }, []);
 
   const puzzle = usePuzzleState();
@@ -53,11 +57,19 @@ export default function CustomGamePage() {
         throw new Error(data.error || "Failed to load custom puzzle");
       }
 
-      setImageUrl(data.url);
-      puzzle.initPuzzle();
+      const img = new Image();
+      img.src = data.url;
+      img.onload = () => {
+        setImageUrl(data.url);
+        puzzle.initPuzzle();
+        setLoading(false);
+      };
+      img.onerror = () => {
+        setError("Failed to load puzzle image.");
+        setLoading(false);
+      };
     } catch (err: any) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   };

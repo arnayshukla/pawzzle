@@ -32,8 +32,12 @@ export default function DailyChallengePage() {
     const params = new URLSearchParams(window.location.search);
     const ct = params.get("challengeTime");
     const cn = params.get("challenger");
+    const diff = params.get("diff");
     if (ct && !isNaN(parseInt(ct))) setChallengeTime(parseInt(ct));
     if (cn) setChallengerName(cn);
+    if (diff && ["easy", "medium", "hard"].includes(diff)) {
+      puzzle.setDifficulty(diff as any);
+    }
   }, []);
 
   const fetchDailyImage = async () => {
@@ -48,25 +52,33 @@ export default function DailyChallengePage() {
         throw new Error(data.error || "Failed to fetch daily challenge");
       }
       const data = await res.json();
-      setImageUrl(data.url);
       setSeedDate(data.seedDate);
       
       const storageKey = `pawzzle_daily_${data.seedDate}`;
       const existingRecord = localStorage.getItem(storageKey);
       
-      if (existingRecord) {
-        setHasPlayedToday(true);
-        try {
-          setDailyData(JSON.parse(existingRecord));
-        } catch (e) {
-          // ignore parsing errors
+      const img = new Image();
+      img.src = data.url;
+      img.onload = () => {
+        setImageUrl(data.url);
+        if (existingRecord) {
+          setHasPlayedToday(true);
+          try {
+            setDailyData(JSON.parse(existingRecord));
+          } catch (e) {
+            // ignore
+          }
+        } else {
+          puzzle.initPuzzle();
         }
-      } else {
-        puzzle.initPuzzle();
-      }
+        setLoading(false);
+      };
+      img.onerror = () => {
+        setError("Failed to load daily image");
+        setLoading(false);
+      };
     } catch (err: any) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   };
