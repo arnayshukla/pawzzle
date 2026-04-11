@@ -56,9 +56,9 @@ export function usePuzzleState(isDaily: boolean = false) {
     setSelectedTileIndex(null);
     setShowNumbers(false);
     
-    // Blind Mode bypasses wait states now
+    // Blind Mode resets
     if (isBlindMode) {
-      setBlindState('playing');
+      setBlindState('idle');
       setBlindCountdown(null);
     }
   }, [size, isDaily, isBlindMode]);
@@ -109,6 +109,16 @@ export function usePuzzleState(isDaily: boolean = false) {
 
   const handleTileClick = (index: number) => {
     if (!isPlaying || isSolved) return;
+    
+    if (isBlindMode && blindState === 'idle') {
+      setBlindState('preview');
+      setBlindCountdown(parseInt(process.env.NEXT_PUBLIC_BLIND_SECONDS || '5'));
+      return; // Do not swap yet
+    }
+    
+    if (isBlindMode && blindState === 'preview') {
+      return; // Ignore clicks during countdown
+    }
     
     if (!hasStartedMoving) setHasStartedMoving(true);
 
@@ -162,7 +172,5 @@ export function usePuzzleState(isDaily: boolean = false) {
     hintPenaltyAmount: parseInt(process.env.NEXT_PUBLIC_HINT_PENALTY_SECONDS || '5'),
     isBlindMode,
     setIsBlindMode,
-    blindState,
-    blindCountdown,
   };
 }

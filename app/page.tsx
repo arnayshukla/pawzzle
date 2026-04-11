@@ -196,31 +196,31 @@ export default function GamePage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8 w-full max-w-4xl mx-auto">
         <Link 
           href="/daily" 
-          className="flex flex-row items-center justify-center gap-2 py-4 px-2 bg-gradient-to-br from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-amber-950 font-bold rounded-2xl shadow-md ring-1 ring-amber-400/50 transition-all hover:scale-105 active:scale-95 text-[14px] sm:text-[15px]"
+          className="flex items-center justify-center gap-2 py-3.5 px-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-amber-950 font-bold rounded-2xl shadow-md ring-1 ring-amber-400/50 transition-all hover:scale-105 active:scale-95 text-[14px] sm:text-[15px]"
         >
-          <Calendar className="w-5 h-5 sm:w-6 sm:h-6" />
-          <span>Daily Canine</span>
+          <Calendar className="w-5 h-5 flex-shrink-0" />
+          <span className="truncate">Daily Canine</span>
         </Link>
         <Link 
           href="/blind" 
-          className="flex flex-row items-center justify-center gap-2 py-4 px-2 bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 text-white font-bold rounded-2xl shadow-md transition-all hover:scale-105 active:scale-95 text-[14px] sm:text-[15px]"
+          className="flex items-center justify-center gap-2 py-3.5 px-2 bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 text-white font-bold rounded-2xl shadow-md transition-all hover:scale-105 active:scale-95 text-[14px] sm:text-[15px]"
         >
-          <EyeOff className="w-5 h-5 sm:w-6 sm:h-6" />
-          <span>Blind Mode</span>
+          <EyeOff className="w-5 h-5 flex-shrink-0" />
+          <span className="truncate">Blind Mode</span>
         </Link>
         <button 
           onClick={() => setShowCustomPackModal(true)}
-          className="flex flex-row items-center justify-center gap-2 py-4 px-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700 transition-all hover:scale-105 active:scale-95 text-[14px] sm:text-[15px]"
+          className="flex items-center justify-center gap-2 py-3.5 px-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700 transition-all hover:scale-105 active:scale-95 text-[14px] sm:text-[15px]"
         >
-          <Camera className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500" />
-          <span>Create Pack</span>
+          <Camera className="w-5 h-5 text-amber-500 flex-shrink-0" />
+          <span className="truncate">Create Pack</span>
         </button>
         <button 
           onClick={() => setShowLeaderboard(true)}
-          className="flex flex-row items-center justify-center gap-2 py-4 px-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700 transition-all hover:scale-105 active:scale-95 text-[14px] sm:text-[15px]"
+          className="flex items-center justify-center gap-2 py-3.5 px-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700 transition-all hover:scale-105 active:scale-95 text-[14px] sm:text-[15px]"
         >
-          <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500" />
-          <span>Leaderboard</span>
+          <Trophy className="w-5 h-5 text-amber-500 flex-shrink-0" />
+          <span className="truncate">Leaderboard</span>
         </button>
       </div>
 
