@@ -192,6 +192,7 @@ export default function CustomGamePage() {
                 imageUrl={imageUrl}
                 isSolved={puzzle.isSolved}
                 showNumbers={puzzle.showNumbers}
+                isBlindMode={puzzle.isBlindMode}
                 blindState={puzzle.blindState}
                 blindCountdown={puzzle.blindCountdown}
               />

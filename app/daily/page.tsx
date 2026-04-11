@@ -275,6 +275,10 @@ export default function DailyChallengePage() {
                 handleTileClick={puzzle.handleTileClick}
                 imageUrl={imageUrl}
                 isSolved={puzzle.isSolved}
+                showNumbers={puzzle.showNumbers}
+                isBlindMode={puzzle.isBlindMode}
+                blindState={puzzle.blindState}
+                blindCountdown={puzzle.blindCountdown}
               />
             </div>
           )}

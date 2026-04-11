@@ -59,18 +59,20 @@ export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImag
             >
               Blind
             </button>
-            <button
-              onClick={useHint}
-              disabled={!isPlaying || isSolved || showNumbers || isBlindMode}
-              className={`px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
-                showNumbers 
-                  ? "bg-amber-500 text-white shadow-md cursor-default" 
-                  : "text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-amber-100 dark:hover:bg-amber-900/30"
-              } ${(!isPlaying || isSolved || showNumbers || isBlindMode) ? "opacity-30 cursor-not-allowed" : ""}`}
-              title={`Penalty Hint: Show numbers (+${hintPenaltyAmount || 5}s penalty)`}
-            >
-              Hint <span className="opacity-70 text-[10px]">+{hintPenaltyAmount || 5}s</span>
-            </button>
+            {isBlindMode && (
+              <button
+                onClick={useHint}
+                disabled={!isPlaying || isSolved || showNumbers}
+                className={`px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                  showNumbers 
+                    ? "bg-amber-500 text-white shadow-md cursor-default" 
+                    : "text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-amber-100 dark:hover:bg-amber-900/30"
+                } ${(!isPlaying || isSolved || showNumbers) ? "opacity-30 cursor-not-allowed" : ""}`}
+                title={`Penalty Hint: Show numbers (+${hintPenaltyAmount || 5}s penalty)`}
+              >
+                Hint <span className="opacity-70 text-[10px]">+{hintPenaltyAmount || 5}s</span>
+              </button>
+            )}
           </div>
         )}
 
