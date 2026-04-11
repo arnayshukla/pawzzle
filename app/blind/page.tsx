@@ -5,13 +5,14 @@ import { usePuzzleState } from "@/hooks/usePuzzleState";
 import { PuzzleBoard } from "@/components/PuzzleBoard";
 import { HUD } from "@/components/HUD";
 import { WinModal } from "@/components/WinModal";
-import { Loader2, ImageOff, Calendar, Trophy, Share2, Check, Camera, X, EyeOff } from "lucide-react";
+import { Loader2, ImageOff, Calendar, Trophy, Share2, Check } from "lucide-react";
 import Link from "next/link";
 import { Leaderboard } from "@/components/Leaderboard";
 import { AnimatePresence } from "framer-motion";
 import { PushSubscriber } from "@/components/PushSubscriber";
 import { CustomPackCreator } from "@/components/CustomPackCreator";
-export default function GamePage() {
+import { EyeOff, X, Camera } from "lucide-react";
+export default function BlindGamePage() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageKey, setImageKey] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -162,12 +163,17 @@ export default function GamePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [puzzle.difficulty]);
 
+  useEffect(() => {
+    // Force blind mode natively
+    puzzle.setIsBlindMode(true);
+  }, []);
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black font-sans flex flex-col pt-12 p-4 sm:p-8 pb-24 sm:pb-32">
       <header className="flex items-center justify-between w-full max-w-2xl mx-auto mb-8 px-4">
         <h1 className="flex items-center gap-3 text-2xl sm:text-3xl font-black tracking-tighter text-zinc-900 dark:text-white select-none">
           <img src="/logo.png" alt="Pawzzle Logo" className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl ring-2 ring-zinc-900 dark:ring-white shadow-sm" />
-          <span className="hidden min-[380px]:inline">Pawzzle.</span>
+          <span className="hidden min-[380px]:inline">Blind Mode.</span>
         </h1>
         
         <div className="flex items-center gap-1.5 sm:gap-2">
@@ -193,35 +199,10 @@ export default function GamePage() {
         </div>
       </header>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8 w-full max-w-4xl mx-auto">
-        <Link 
-          href="/daily" 
-          className="flex flex-col items-center justify-center gap-1.5 py-4 px-2 bg-gradient-to-br from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-amber-950 font-bold rounded-2xl shadow-md ring-1 ring-amber-400/50 transition-all hover:scale-105 active:scale-95 text-[14px] sm:text-[15px]"
-        >
-          <Calendar className="w-6 h-6" />
-          <span>Daily Canine</span>
-        </Link>
-        <Link 
-          href="/blind" 
-          className="flex flex-col items-center justify-center gap-1.5 py-4 px-2 bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 text-white font-bold rounded-2xl shadow-md transition-all hover:scale-105 active:scale-95 text-[14px] sm:text-[15px]"
-        >
-          <EyeOff className="w-6 h-6" />
-          <span>Blind Mode</span>
-        </Link>
-        <button 
-          onClick={() => setShowCustomPackModal(true)}
-          className="flex flex-col items-center justify-center gap-1.5 py-4 px-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700 transition-all hover:scale-105 active:scale-95 text-[14px] sm:text-[15px]"
-        >
-          <Camera className="w-6 h-6 text-amber-500" />
-          <span>Create Pack</span>
-        </button>
-        <button 
-          onClick={() => setShowLeaderboard(true)}
-          className="flex flex-col items-center justify-center gap-1.5 py-4 px-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm ring-1 ring-zinc-200 dark:ring-zinc-700 transition-all hover:scale-105 active:scale-95 text-[14px] sm:text-[15px]"
-        >
-          <Trophy className="w-6 h-6 text-amber-500" />
-          <span>Leaderboard</span>
-        </button>
+      <div className="flex items-center justify-center mb-8 px-4 w-full max-w-xl mx-auto">
+         <Link href="/" className="px-5 py-3 w-full max-w-sm text-center bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white flex items-center justify-center gap-2">
+            Go Back
+         </Link>
       </div>
 
       {challengeTime && (
@@ -301,6 +282,11 @@ export default function GamePage() {
             setDifficulty={puzzle.setDifficulty}
             onReset={puzzle.initPuzzle}
             onNewImage={() => fetchNewImage(selectedCategory)}
+            showNumbers={puzzle.showNumbers}
+            useHint={puzzle.useHint}
+            hintPenaltyAmount={puzzle.hintPenaltyAmount}
+            isBlindMode={puzzle.isBlindMode}
+            setIsBlindMode={puzzle.setIsBlindMode}
             isPlaying={puzzle.isPlaying}
             hasStartedMoving={puzzle.hasStartedMoving}
             isSolved={puzzle.isSolved}
@@ -316,6 +302,10 @@ export default function GamePage() {
                 handleTileClick={puzzle.handleTileClick}
                 imageUrl={imageUrl}
                 isSolved={puzzle.isSolved}
+                showNumbers={puzzle.showNumbers}
+                isBlindMode={puzzle.isBlindMode}
+                blindState={puzzle.blindState}
+                blindCountdown={puzzle.blindCountdown}
               />
             </div>
           )}
@@ -330,7 +320,7 @@ export default function GamePage() {
             imageUrl={imageUrl || ""}
             onPlayAgain={puzzle.initPuzzle}
             onNewImage={() => fetchNewImage(selectedCategory)}
-            puzzleId={`endless-${puzzle.difficulty}`}
+            puzzleId={`blind-${puzzle.difficulty}`}
             onViewLeaderboard={() => setShowLeaderboard(true)}
             isEndless={true}
             imageKey={imageKey}
@@ -344,7 +334,7 @@ export default function GamePage() {
       <AnimatePresence>
         {showLeaderboard && (
           <Leaderboard 
-            puzzleId={`endless-${puzzle.difficulty}`} 
+            puzzleId={`blind-${puzzle.difficulty}`} 
             onClose={() => setShowLeaderboard(false)} 
           />
         )}

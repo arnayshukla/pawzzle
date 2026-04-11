@@ -75,7 +75,8 @@ export function PuzzleBoard({
             className={cn(
               "cursor-pointer bg-zinc-300 dark:bg-zinc-700 w-full h-full transform-gpu",
               isSelected && "ring-4 ring-black dark:ring-white ring-inset shadow-2xl",
-              !isSolved && "hover:opacity-90"
+              !isSolved && "hover:opacity-90",
+              (isBlindMode && blindState === 'playing' && !isSolved) && "border-2 border-zinc-500 dark:border-zinc-500/50 shadow-inner"
             )}
             style={{
               backgroundImage: (isBlindMode && blindState === 'playing' && !isSolved) ? 'none' : `url(${imageUrl})`,
@@ -95,7 +96,7 @@ export function PuzzleBoard({
 
       {/* Peek or Blind Preview Overlay */}
       {(isPeeking || (isBlindMode && (blindState === 'idle' || blindState === 'preview'))) && !isSolved && (
-        <div className="absolute inset-0 z-20 rounded-2xl overflow-hidden pointer-events-none shadow-inner bg-zinc-200 dark:bg-zinc-800" style={{ backgroundImage: `url(${imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        <div className="absolute inset-0 z-20 rounded-2xl overflow-hidden pointer-events-none shadow-inner bg-zinc-200 dark:bg-zinc-800" style={{ backgroundImage: `url(${imageUrl})`, backgroundSize: '100% 100%', backgroundPosition: 'center' }}>
           {/* Tiled Grid lines overlay */}
           <div className="w-full h-full" style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }}>
             {Array.from({length: rows * cols}).map((_, i) => (
