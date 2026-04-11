@@ -17,8 +17,8 @@ interface PuzzleBoardProps {
   // Mechanics
   showNumbers?: boolean;
   isBlindMode?: boolean;
-  blindState?: 'idle' | 'preview' | 'playing';
-  blindCountdown?: number | null;
+  blindState?: 'idle' | 'preview' | 'playing'; // Kept for backwards prop compatibility
+  blindCountdown?: number | null; // Kept for backwards prop compatibility
 }
 
 export function PuzzleBoard({
@@ -75,11 +75,10 @@ export function PuzzleBoard({
             className={cn(
               "cursor-pointer bg-zinc-300 dark:bg-zinc-700 w-full h-full transform-gpu",
               isSelected && "ring-4 ring-black dark:ring-white ring-inset shadow-2xl",
-              !isSolved && "hover:opacity-90",
-              (isBlindMode && blindState === 'playing' && !isSolved) && "border-2 border-zinc-500 dark:border-zinc-500/50 shadow-inner"
+              !isSolved && "hover:opacity-90"
             )}
             style={{
-              backgroundImage: (isBlindMode && blindState === 'playing' && !isSolved) ? 'none' : `url(${imageUrl})`,
+              backgroundImage: `url(${imageUrl})`,
               backgroundSize: `${cols * 100}% ${rows * 100}%`,
               backgroundPosition: `${bgPosX}% ${bgPosY}%`,
             }}
@@ -94,8 +93,8 @@ export function PuzzleBoard({
       })}
       </div>
 
-      {/* Peek or Blind Preview Overlay */}
-      {(isPeeking || (isBlindMode && (blindState === 'idle' || blindState === 'preview'))) && !isSolved && (
+      {/* Peek Overlay (Only used in standard mode, disabled in isBlindMode explicitly at button logic) */}
+      {isPeeking && !isSolved && (
         <div className="absolute inset-0 z-20 rounded-2xl overflow-hidden pointer-events-none shadow-inner bg-zinc-200 dark:bg-zinc-800" style={{ backgroundImage: `url(${imageUrl})`, backgroundSize: '100% 100%', backgroundPosition: 'center' }}>
           {/* Tiled Grid lines overlay */}
           <div className="w-full h-full" style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }}>
@@ -106,31 +105,8 @@ export function PuzzleBoard({
         </div>
       )}
       
-      {/* Blind Countdown Overlay Text */}
-      {isBlindMode && blindState === 'preview' && blindCountdown !== null && (
-        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/50 rounded-2xl pointer-events-none backdrop-blur-[2px]">
-           <span className="text-white text-6xl sm:text-7xl font-black drop-shadow-2xl animate-pulse">
-             {blindCountdown}
-           </span>
-           <span className="text-white/90 font-bold mt-4 text-xs sm:text-sm uppercase tracking-widest drop-shadow-md">Memorize carefully...</span>
-        </div>
-      )}
-
-      {/* Start Blind Overlay Text */}
-      {isBlindMode && blindState === 'idle' && !isSolved && (
-        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/40 hover:bg-black/20 rounded-2xl backdrop-blur-[2px] transition-all cursor-pointer group"
-             onClick={() => handleTileClick(0)} // Triggers the start!
-        >
-           <div className="bg-white/10 px-6 py-4 rounded-2xl backdrop-blur-md ring-1 ring-white/20 shadow-2xl pointer-events-none group-hover:scale-105 transition-transform">
-             <span className="text-white text-lg sm:text-xl font-black drop-shadow-md">
-               Click to Start Blind Preview
-             </span>
-           </div>
-        </div>
-      )}
-
-      {/* Peek Button Container */}
-      {!isSolved && !(isBlindMode && (blindState === 'idle' || blindState === 'preview' || blindState === 'playing')) && (
+      {/* Peek Button Container (Hidden in blind mode natively!) */}
+      {!isSolved && !isBlindMode && (
         <button 
           className="absolute -top-3 -right-3 sm:-right-4 sm:-top-4 z-30 p-2.5 sm:p-3 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 shadow-xl ring-1 ring-black/10 dark:ring-white/10 rounded-full text-zinc-700 dark:text-zinc-300 transition-transform active:scale-95 cursor-help"
           onPointerDown={(e) => { e.preventDefault(); setIsPeeking(true); }}
