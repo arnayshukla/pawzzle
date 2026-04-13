@@ -99,11 +99,11 @@ export function PuzzleBoard({
 
       {/* Blind Countdown Overlay Text */}
       {isBlindMode && blindState === 'preview' && blindCountdown !== null && (
-        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/50 rounded-2xl pointer-events-none backdrop-blur-[2px]">
-           <span className="text-white text-6xl sm:text-7xl font-black drop-shadow-2xl animate-pulse">
-             {blindCountdown}
-           </span>
-           <span className="text-white/90 font-bold mt-4 text-xs sm:text-sm uppercase tracking-widest drop-shadow-md">Memorize carefully...</span>
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+           <div className="bg-black/70 backdrop-blur-md px-6 py-2 rounded-full ring-1 ring-white/20 shadow-2xl flex items-center justify-center gap-3">
+             <span className="text-white/90 font-bold text-xs sm:text-sm uppercase tracking-wider">Memorize:</span>
+             <span className="text-white text-xl sm:text-2xl font-black tabular-nums text-amber-500 animate-pulse">{blindCountdown}s</span>
+           </div>
         </div>
       )}
 
