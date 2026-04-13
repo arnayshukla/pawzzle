@@ -21,11 +21,8 @@ export function usePuzzleState(isDaily: boolean = false) {
   const [time, setTime] = useState(0); // in seconds
   const [selectedTileIndex, setSelectedTileIndex] = useState<number | null>(null);
 
-  // New Mechanics State
   const [showNumbers, setShowNumbers] = useState(false);
   const [isBlindMode, setIsBlindMode] = useState(false);
-  const [blindState, setBlindState] = useState<'idle' | 'preview' | 'playing'>('idle');
-  const [blindCountdown, setBlindCountdown] = useState<number | null>(null);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -55,12 +52,7 @@ export function usePuzzleState(isDaily: boolean = false) {
     setHasStartedMoving(false);
     setSelectedTileIndex(null);
     setShowNumbers(false);
-    
-    // Blind Mode resets
-    if (isBlindMode) {
-      setBlindState('idle');
-      setBlindCountdown(null);
-    }
+    setShowNumbers(false);
   }, [size, isDaily, isBlindMode]);
 
   // Check for win
@@ -80,10 +72,7 @@ export function usePuzzleState(isDaily: boolean = false) {
 
   // Timer
   useEffect(() => {
-    // Only run timer if not in blind preview
-    const isPreviewing = isBlindMode && blindState !== 'playing';
-    
-    if (isPlaying && hasStartedMoving && !isSolved && !isPreviewing) {
+    if (isPlaying && hasStartedMoving && !isSolved) {
       timerRef.current = setInterval(() => {
         setTime((prev) => prev + 1);
       }, 1000);
@@ -94,31 +83,10 @@ export function usePuzzleState(isDaily: boolean = false) {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPlaying, hasStartedMoving, isSolved, isBlindMode, blindState]);
-
-  // Blind Countdown logic
-  useEffect(() => {
-    if (blindCountdown !== null && blindCountdown > 0) {
-      const id = setTimeout(() => setBlindCountdown(blindCountdown - 1), 1000);
-      return () => clearTimeout(id);
-    } else if (blindCountdown === 0) {
-      setBlindState('playing');
-      setBlindCountdown(null);
-    }
-  }, [blindCountdown]);
+  }, [isPlaying, hasStartedMoving, isSolved]);
 
   const handleTileClick = (index: number) => {
     if (!isPlaying || isSolved) return;
-    
-    if (isBlindMode && blindState === 'idle') {
-      setBlindState('preview');
-      setBlindCountdown(parseInt(process.env.NEXT_PUBLIC_BLIND_SECONDS || '5'));
-      return; // Do not swap yet
-    }
-    
-    if (isBlindMode && blindState === 'preview') {
-      return; // Ignore clicks during countdown
-    }
     
     if (!hasStartedMoving) setHasStartedMoving(true);
 
@@ -171,6 +139,6 @@ export function usePuzzleState(isDaily: boolean = false) {
     },
     hintPenaltyAmount: parseInt(process.env.NEXT_PUBLIC_HINT_PENALTY_SECONDS || '5'),
     isBlindMode,
-    setIsBlindMode,
+    setIsBlindMode
   };
 }

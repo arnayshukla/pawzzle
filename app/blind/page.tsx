@@ -200,7 +200,7 @@ export default function BlindGamePage() {
       </header>
 
       <div className="flex items-center justify-center mb-8 px-4 w-full max-w-xl mx-auto">
-         <Link href="/" className="px-5 py-3 w-full max-w-sm text-center bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2">
+         <Link href="/" className="px-5 py-3 w-full max-w-sm text-center bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-bold rounded-2xl shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white flex items-center justify-center gap-2">
             Go Back
          </Link>
       </div>

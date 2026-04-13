@@ -89,7 +89,7 @@ export function PuzzleBoard({
       })}
       </div>
 
-      {/* Peek Overlay */}
+      {/* Peek Image Overlay */}
       {isPeeking && !isSolved && (
         <div className="absolute inset-0 z-20 rounded-2xl overflow-hidden pointer-events-none shadow-inner bg-zinc-200 dark:bg-zinc-800" style={{ backgroundImage: `url(${imageUrl})`, backgroundSize: '100% 100%', backgroundPosition: 'center' }}>
           {/* Tiled Grid lines overlay */}
@@ -100,7 +100,7 @@ export function PuzzleBoard({
           </div>
         </div>
       )}
-
+      
       {/* Peek Button Container */}
       {!isSolved && !isBlindMode && (
         <button 
