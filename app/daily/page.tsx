@@ -255,7 +255,6 @@ export default function DailyChallengePage() {
             onReset={puzzle.initPuzzle}
             onNewImage={fetchDailyImage}
             isDaily={true}
-            showNumbers={puzzle.showNumbers}
             useHint={puzzle.useHint}
             hintPenaltyAmount={puzzle.hintPenaltyAmount}
             isBlindMode={puzzle.isBlindMode}

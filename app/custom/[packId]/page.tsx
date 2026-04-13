@@ -171,7 +171,6 @@ export default function CustomGamePage() {
             setDifficulty={puzzle.setDifficulty}
             onReset={puzzle.initPuzzle}
             onNewImage={fetchNewImage}
-            showNumbers={puzzle.showNumbers}
             useHint={puzzle.useHint}
             hintPenaltyAmount={puzzle.hintPenaltyAmount}
             isBlindMode={puzzle.isBlindMode}
