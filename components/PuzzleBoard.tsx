@@ -15,7 +15,6 @@ interface PuzzleBoardProps {
   isSolved: boolean;
   
   // Mechanics
-  showNumbers?: boolean;
   isBlindMode?: boolean;
   blindState?: 'idle' | 'preview' | 'playing';
   blindCountdown?: number | null;
@@ -29,7 +28,6 @@ export function PuzzleBoard({
   handleTileClick,
   imageUrl,
   isSolved,
-  showNumbers,
   isBlindMode,
   blindState,
   blindCountdown,
@@ -82,13 +80,7 @@ export function PuzzleBoard({
               backgroundSize: `${cols * 100}% ${rows * 100}%`,
               backgroundPosition: `${bgPosX}% ${bgPosY}%`,
             }}
-          >
-            {showNumbers && (
-              <span className="absolute top-1 left-1.5 text-[10px] sm:text-xs font-black text-white mix-blend-difference drop-shadow-md opacity-90">
-                {tileId + 1}
-              </span>
-            )}
-          </motion.div>
+          />
         );
       })}
       </div>

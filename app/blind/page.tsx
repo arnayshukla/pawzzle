@@ -282,7 +282,6 @@ export default function BlindGamePage() {
             setDifficulty={puzzle.setDifficulty}
             onReset={puzzle.initPuzzle}
             onNewImage={() => fetchNewImage(selectedCategory)}
-            showNumbers={puzzle.showNumbers}
             useHint={puzzle.useHint}
             hintPenaltyAmount={puzzle.hintPenaltyAmount}
             isBlindMode={puzzle.isBlindMode}
@@ -302,7 +301,6 @@ export default function BlindGamePage() {
                 handleTileClick={puzzle.handleTileClick}
                 imageUrl={imageUrl}
                 isSolved={puzzle.isSolved}
-                showNumbers={puzzle.showNumbers}
                 isBlindMode={puzzle.isBlindMode}
                 blindState={puzzle.blindState}
                 blindCountdown={puzzle.blindCountdown}

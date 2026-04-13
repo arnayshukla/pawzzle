@@ -21,7 +21,6 @@ export function usePuzzleState(isDaily: boolean = false) {
   const [time, setTime] = useState(0); // in seconds
   const [selectedTileIndex, setSelectedTileIndex] = useState<number | null>(null);
 
-  const [showNumbers, setShowNumbers] = useState(false);
   const [isBlindMode, setIsBlindMode] = useState(false);
   const [blindState, setBlindState] = useState<'idle' | 'preview' | 'playing'>('idle');
   const [blindCountdown, setBlindCountdown] = useState<number | null>(null);
@@ -53,8 +52,6 @@ export function usePuzzleState(isDaily: boolean = false) {
     setIsPlaying(true);
     setHasStartedMoving(false);
     setSelectedTileIndex(null);
-    setShowNumbers(false);
-    setShowNumbers(false);
   }, [size, isDaily, isBlindMode]);
 
   // Check for win
@@ -156,12 +153,30 @@ export function usePuzzleState(isDaily: boolean = false) {
     setIsPlaying,
     
     // Mechanics
-    showNumbers,
     useHint: () => {
-      if (!isPlaying || isSolved || showNumbers) return;
-      setShowNumbers(true);
-      const penalty = parseInt(process.env.NEXT_PUBLIC_HINT_PENALTY_SECONDS || '5');
-      setTime(t => t + penalty);
+      if (!isPlaying || isSolved) return;
+      
+      const newOrder = [...order];
+      const incorrectIndices = newOrder.map((val, idx) => val !== idx ? idx : -1).filter(idx => idx !== -1);
+      
+      if (incorrectIndices.length > 0) {
+        const randomIndex = Math.floor(Math.random() * incorrectIndices.length);
+        const targetIndex = incorrectIndices[randomIndex];
+        const curPos = newOrder.indexOf(targetIndex);
+        
+        // Swap them
+        const temp = newOrder[targetIndex];
+        newOrder[targetIndex] = newOrder[curPos];
+        newOrder[curPos] = temp;
+        
+        setOrder(newOrder);
+        setMoves(m => m + 1);
+        playSound('click');
+        triggerVibration('light');
+        
+        const penalty = parseInt(process.env.NEXT_PUBLIC_HINT_PENALTY_SECONDS || '5');
+        setTime(t => t + penalty);
+      }
     },
     hintPenaltyAmount: parseInt(process.env.NEXT_PUBLIC_HINT_PENALTY_SECONDS || '5'),
     isBlindMode,

@@ -13,7 +13,6 @@ interface HUDProps {
   isDaily?: boolean;
 
   // Mechanics
-  showNumbers?: boolean;
   useHint?: () => void;
   hintPenaltyAmount?: number;
   isBlindMode?: boolean;
@@ -23,7 +22,7 @@ interface HUDProps {
   isSolved?: boolean;
 }
 
-export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImage, isDaily, showNumbers, useHint, hintPenaltyAmount, isBlindMode, setIsBlindMode, isPlaying, hasStartedMoving, isSolved }: HUDProps) {
+export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImage, isDaily, useHint, hintPenaltyAmount, isBlindMode, setIsBlindMode, isPlaying, hasStartedMoving, isSolved }: HUDProps) {
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -49,13 +48,11 @@ export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImag
           <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 rounded-xl p-1 shadow-inner mr-2 sm:mr-4 transition-all">
             <button
               onClick={useHint}
-              disabled={!isPlaying || isSolved || showNumbers}
-              className={`px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
-                showNumbers 
-                  ? "bg-amber-500 text-white shadow-md cursor-default" 
-                  : "text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-amber-100 dark:hover:bg-amber-900/30"
-              } ${(!isPlaying || isSolved || showNumbers) ? "opacity-30 cursor-not-allowed" : ""}`}
-              title={`Penalty Hint: Show numbers (+${hintPenaltyAmount || 5}s penalty)`}
+              disabled={!isPlaying || isSolved}
+              className={`px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1 text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-amber-100 dark:hover:bg-amber-900/30 ${
+                (!isPlaying || isSolved) ? "opacity-30 cursor-not-allowed" : ""
+              }`}
+              title={`Penalty Hint: Auto-place one block (+${hintPenaltyAmount || 5}s penalty)`}
             >
               Hint <span className="opacity-70 text-[10px]">+{hintPenaltyAmount || 5}s</span>
             </button>
