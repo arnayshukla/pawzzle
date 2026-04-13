@@ -304,6 +304,8 @@ export default function BlindGamePage() {
                 isSolved={puzzle.isSolved}
                 showNumbers={puzzle.showNumbers}
                 isBlindMode={puzzle.isBlindMode}
+                blindState={puzzle.blindState}
+                blindCountdown={puzzle.blindCountdown}
               />
             </div>
           )}
