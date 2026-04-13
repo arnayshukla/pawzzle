@@ -73,7 +73,7 @@ export function PuzzleBoard({
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
             onClick={() => handleTileClick(index)}
             className={cn(
-              "cursor-pointer bg-zinc-300 dark:bg-zinc-700 w-full h-full transform-gpu",
+              "relative overflow-hidden cursor-pointer bg-zinc-300 dark:bg-zinc-700 w-full h-full transform-gpu",
               isSelected && "ring-4 ring-black dark:ring-white ring-inset shadow-2xl",
               !isSolved && "hover:opacity-90"
             )}
