@@ -156,11 +156,6 @@ export default function DailyChallengePage() {
         <img src="/logo.png" alt="Pawzzle Logo" className="w-12 h-12 rounded-xl ring-2 ring-amber-400" />
         <div className="flex items-center gap-2">
           Daily Canine
-          {streak >= 1 && (
-            <span title={`${streak} Day Streak!`} className="flex items-center gap-1 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-lg sm:text-lg font-bold px-3 py-1 rounded-xl ring-1 ring-orange-200 dark:ring-orange-800 shadow-sm animate-pulse">
-              {streak} <span className="text-xl">🔥</span>
-            </span>
-          )}
         </div>
       </h1>
 
@@ -255,6 +250,7 @@ export default function DailyChallengePage() {
             onReset={puzzle.initPuzzle}
             onNewImage={fetchDailyImage}
             isDaily={true}
+            streak={streak}
             useHint={puzzle.useHint}
             hintPenaltyAmount={puzzle.hintPenaltyAmount}
             isBlindMode={puzzle.isBlindMode}

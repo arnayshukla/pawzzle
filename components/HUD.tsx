@@ -11,6 +11,7 @@ interface HUDProps {
   onReset: () => void;
   onNewImage: () => void;
   isDaily?: boolean;
+  streak?: number;
 
   // Mechanics
   useHint?: () => void;
@@ -18,11 +19,10 @@ interface HUDProps {
   isBlindMode?: boolean;
   setIsBlindMode?: (b: boolean) => void;
   isPlaying?: boolean;
-  hasStartedMoving?: boolean;
   isSolved?: boolean;
 }
 
-export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImage, isDaily, useHint, hintPenaltyAmount, isBlindMode, setIsBlindMode, isPlaying, hasStartedMoving, isSolved }: HUDProps) {
+export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImage, isDaily, streak, useHint, hintPenaltyAmount, isBlindMode, setIsBlindMode, isPlaying, hasStartedMoving, isSolved }: HUDProps) {
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -40,6 +40,11 @@ export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImag
           <Hash className="w-5 h-5" />
           <span className="font-mono text-xl font-semibold tracking-tight">{moves}</span>
         </div>
+        {streak !== undefined && streak >= 1 && (
+            <span title={`${streak} Day Streak!`} className="ml-2 flex items-center gap-1 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-[15px] sm:text-base font-bold px-2.5 py-0.5 rounded-lg ring-1 ring-orange-200 dark:ring-orange-800 shadow-sm animate-pulse">
+              {streak} <span className="text-base">🔥</span>
+            </span>
+        )}
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
