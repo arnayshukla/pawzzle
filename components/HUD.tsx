@@ -1,7 +1,7 @@
 "use client";
 
 import { Difficulty } from "@/hooks/usePuzzleState";
-import { Timer, Hash, RefreshCcw } from "lucide-react";
+import { Timer, Hash, RefreshCcw, Flame } from "lucide-react";
 
 interface HUDProps {
   moves: number;
@@ -41,11 +41,6 @@ export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImag
           <Hash className="w-5 h-5" />
           <span className="font-mono text-xl font-semibold tracking-tight">{moves}</span>
         </div>
-        {streak !== undefined && streak >= 1 && (
-            <span title={`${streak} Day Streak!`} className="ml-2 flex items-center gap-1 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-[15px] sm:text-base font-bold px-2.5 py-0.5 rounded-lg ring-1 ring-orange-200 dark:ring-orange-800 shadow-sm animate-pulse">
-              {streak} <span className="text-base">🔥</span>
-            </span>
-        )}
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
@@ -94,6 +89,14 @@ export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImag
           >
             New Image
           </button>
+        )}
+        
+        {/* Daily Mode Streak Badge (Right Corner) */}
+        {streak !== undefined && streak >= 1 && (
+            <span title={`${streak} Day Streak!`} className="flex items-center gap-1 sm:gap-1.5 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-[15px] sm:text-base font-bold px-3 py-1.5 rounded-xl ring-1 ring-orange-200 dark:ring-orange-800 shadow-sm animate-pulse">
+              <Flame className="w-4 h-4 sm:w-5 sm:h-5 fill-orange-500 dark:fill-orange-500" /> 
+              {streak}
+            </span>
         )}
       </div>
     </div>
