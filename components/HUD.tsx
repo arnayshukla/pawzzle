@@ -19,6 +19,7 @@ interface HUDProps {
   isBlindMode?: boolean;
   setIsBlindMode?: (b: boolean) => void;
   isPlaying?: boolean;
+  hasStartedMoving?: boolean;
   isSolved?: boolean;
 }
 
