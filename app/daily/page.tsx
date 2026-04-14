@@ -5,7 +5,7 @@ import { usePuzzleState } from "@/hooks/usePuzzleState";
 import { PuzzleBoard } from "@/components/PuzzleBoard";
 import { HUD } from "@/components/HUD";
 import { WinModal } from "@/components/WinModal";
-import { Loader2, ImageOff, ArrowLeft, Trophy, Share2, Check } from "lucide-react";
+import { Loader2, ImageOff, ArrowLeft, Trophy, Share2, Check, Flame } from "lucide-react";
 import Link from "next/link";
 import { AnimatePresence } from "framer-motion";
 import { Leaderboard } from "@/components/Leaderboard";
@@ -213,6 +213,15 @@ export default function DailyChallengePage() {
            <div className="text-5xl">🐾</div>
            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">You've completed today's challenge!</h2>
            
+           {streak >= 1 && (
+             <div className="flex justify-center -mt-2 mb-2">
+               <span title={`${streak} Day Streak!`} className="flex items-center gap-1.5 sm:gap-2 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-base sm:text-lg font-bold px-4 py-1.5 rounded-xl ring-1 ring-orange-200 dark:ring-orange-800 shadow-sm animate-pulse">
+                 <Flame className="w-5 h-5 fill-orange-500 dark:fill-orange-500" /> 
+                 {streak} Day Streak!
+               </span>
+             </div>
+           )}
+
            {dailyData && (
              <div className="grid grid-cols-2 gap-4 w-full">
                <div className="bg-zinc-100 dark:bg-zinc-800/50 rounded-2xl p-5 ring-1 ring-zinc-200 dark:ring-zinc-800 shadow-sm">
@@ -293,6 +302,7 @@ export default function DailyChallengePage() {
               onViewLeaderboard={() => setShowLeaderboard(true)}
               challengeTime={challengeTime}
               challengerName={challengerName}
+              streak={streak}
             />
           )}
         </div>

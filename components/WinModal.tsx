@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Trophy, RefreshCcw, Image as ImageIcon, ZoomIn, X, Download } from "lucide-react";
+import { Trophy, RefreshCcw, Image as ImageIcon, ZoomIn, X, Download, Flame } from "lucide-react";
 import confetti from "canvas-confetti";
 import { Difficulty } from "@/hooks/usePuzzleState";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,6 +23,7 @@ interface WinModalProps {
   challengerName?: string;
   isEndless?: boolean; // Endless puzzles change randomly, they can't be challenged properly without storing the exact image URL context.
   imageKey?: string | null;
+  streak?: number;
 }
 
 export function WinModal({
@@ -41,6 +42,7 @@ export function WinModal({
   challengerName,
   isEndless,
   imageKey,
+  streak,
 }: WinModalProps) {
   const [enlarged, setEnlarged] = useState(false);
   const [bestMoves, setBestMoves] = useState<number | null>(null);
@@ -185,6 +187,15 @@ export function WinModal({
                   : `You were too slow to beat ${challengeTime}s...`)
               : `You solved the ${difficulty} puzzle.`}
           </p>
+
+          {streak !== undefined && streak >= 1 && (
+            <div className="flex justify-center mb-6 mt-[-10px]">
+              <span title={`${streak} Day Streak!`} className="flex items-center gap-1.5 sm:gap-2 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-base sm:text-lg font-bold px-4 py-2 rounded-xl ring-1 ring-orange-200 dark:ring-orange-800 shadow-sm animate-pulse">
+                <Flame className="w-5 h-5 fill-orange-500 dark:fill-orange-500" /> 
+                {streak} Day Streak!
+              </span>
+            </div>
+          )}
 
           <div
             className="w-full h-32 sm:h-40 rounded-xl overflow-hidden mb-6 cursor-zoom-in ring-1 ring-black/10 dark:ring-white/10 group relative bg-zinc-100 dark:bg-zinc-800 flex-shrink-0"

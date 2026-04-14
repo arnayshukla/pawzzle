@@ -31,7 +31,7 @@ export function CustomPackCreator() {
   /**
    * Client-side compression & EXIF stripping via HTML5 Canvas
    */
-  const processImageToWebP = async (file: File): Promise<Blob> => {
+  const processImageToJpeg = async (file: File): Promise<Blob> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       const url = URL.createObjectURL(file);
@@ -61,11 +61,11 @@ export function CustomPackCreator() {
         // Drawing the image strips all EXIF metadata natively!
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Compress aggresively to WebP (0.8 quality usually yields ~80KB per image)
+        // Compress aggresively to JPEG (0.6 quality ensures ~50KB per image limit to bypass Vercel 4.5MB 413 caps)
         canvas.toBlob((blob) => {
           if (blob) resolve(blob);
           else reject(new Error('Canvas toBlob failed'));
-        }, 'image/webp', 0.8);
+        }, 'image/jpeg', 0.6);
       };
       
       img.onerror = () => reject(new Error('Failed to load image for processing'));
@@ -86,8 +86,8 @@ export function CustomPackCreator() {
       // Process all files through Canvas before network upload
       for (let i = 0; i < selectedFiles.length; i++) {
         const file = selectedFiles[i];
-        const compressedBlob = await processImageToWebP(file);
-        formData.append('files', compressedBlob, `custom-${i}.webp`);
+        const compressedBlob = await processImageToJpeg(file);
+        formData.append('files', compressedBlob, `custom-${i}.jpg`);
         setUploadProgress(10 + Math.floor(((i + 1) / selectedFiles.length) * 40)); 
       }
 
@@ -98,7 +98,14 @@ export function CustomPackCreator() {
         body: formData,
       });
 
-      const data = await res.json();
+      const responseText = await res.text();
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        throw new Error(`Upload dropped (Code ${res.status}). Payload might be too large.`);
+      }
+      
       setUploadProgress(100);
 
       if (!res.ok) {
