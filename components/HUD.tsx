@@ -1,7 +1,7 @@
 "use client";
 
 import { Difficulty } from "@/hooks/usePuzzleState";
-import { Timer, Hash, RefreshCcw } from "lucide-react";
+import { Timer, Hash, RefreshCcw, Flame } from "lucide-react";
 
 interface HUDProps {
   moves: number;
@@ -11,9 +11,19 @@ interface HUDProps {
   onReset: () => void;
   onNewImage: () => void;
   isDaily?: boolean;
+  streak?: number;
+
+  // Mechanics
+  useHint?: () => void;
+  hintPenaltyAmount?: number;
+  isBlindMode?: boolean;
+  setIsBlindMode?: (b: boolean) => void;
+  isPlaying?: boolean;
+  hasStartedMoving?: boolean;
+  isSolved?: boolean;
 }
 
-export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImage, isDaily }: HUDProps) {
+export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImage, isDaily, streak, useHint, hintPenaltyAmount, isBlindMode, setIsBlindMode, isPlaying, hasStartedMoving, isSolved }: HUDProps) {
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -33,7 +43,23 @@ export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImag
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
+        {/* Mechanics Container */}
+        {useHint && isBlindMode && !isDaily && (
+          <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 rounded-xl p-1 shadow-inner mr-2 sm:mr-4 transition-all">
+            <button
+              onClick={useHint}
+              disabled={!isPlaying || isSolved}
+              className={`px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1 text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-amber-100 dark:hover:bg-amber-900/30 ${
+                (!isPlaying || isSolved) ? "opacity-30 cursor-not-allowed" : ""
+              }`}
+              title={`Penalty Hint: Auto-place one block (+${hintPenaltyAmount || 5}s penalty)`}
+            >
+              Hint <span className="opacity-70 text-[10px]">+{hintPenaltyAmount || 5}s</span>
+            </button>
+          </div>
+        )}
+
         {!isDaily && (
           <select
             value={difficulty}
@@ -63,6 +89,14 @@ export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImag
           >
             New Image
           </button>
+        )}
+        
+        {/* Daily Mode Streak Badge (Right Corner) */}
+        {streak !== undefined && streak >= 1 && (
+            <span title={`${streak} Day Streak!`} className="flex items-center gap-1 sm:gap-1.5 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-[15px] sm:text-base font-bold px-3 py-1.5 rounded-xl ring-1 ring-orange-200 dark:ring-orange-800 shadow-sm animate-pulse">
+              <Flame className="w-4 h-4 sm:w-5 sm:h-5 fill-orange-500 dark:fill-orange-500" /> 
+              {streak}
+            </span>
         )}
       </div>
     </div>

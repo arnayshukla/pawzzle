@@ -171,6 +171,13 @@ export default function CustomGamePage() {
             setDifficulty={puzzle.setDifficulty}
             onReset={puzzle.initPuzzle}
             onNewImage={fetchNewImage}
+            useHint={puzzle.useHint}
+            hintPenaltyAmount={puzzle.hintPenaltyAmount}
+            isBlindMode={puzzle.isBlindMode}
+            setIsBlindMode={puzzle.setIsBlindMode}
+            isPlaying={puzzle.isPlaying}
+            hasStartedMoving={puzzle.hasStartedMoving}
+            isSolved={puzzle.isSolved}
           />
           
           {imageUrl && puzzle.order.length > 0 && (
@@ -183,6 +190,9 @@ export default function CustomGamePage() {
                 handleTileClick={puzzle.handleTileClick}
                 imageUrl={imageUrl}
                 isSolved={puzzle.isSolved}
+                isBlindMode={puzzle.isBlindMode}
+                blindState={puzzle.blindState}
+                blindCountdown={puzzle.blindCountdown}
               />
             </div>
           )}
