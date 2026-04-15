@@ -5,7 +5,7 @@ import { usePuzzleState } from "@/hooks/usePuzzleState";
 import { PuzzleBoard } from "@/components/PuzzleBoard";
 import { HUD } from "@/components/HUD";
 import { WinModal } from "@/components/WinModal";
-import { Loader2, ImageOff, Calendar, Trophy, Share2, Check } from "lucide-react";
+import { Loader2, ImageOff, RefreshCcw, Calendar, Trophy, Share2, Check } from "lucide-react";
 import Link from "next/link";
 import { Leaderboard } from "@/components/Leaderboard";
 import { AnimatePresence } from "framer-motion";
@@ -43,7 +43,7 @@ export default function BlindGamePage() {
     }
   };
 
-  const fetchNewImage = async (categoryToFetch = selectedCategory) => {
+  const fetchNewImage = async (categoryToFetch: string = "all", retryCount = 0) => {
     setLoading(true);
     setError(null);
     puzzle.setIsPlaying(false);
@@ -92,12 +92,20 @@ export default function BlindGamePage() {
         setLoading(false);
       };
       img.onerror = () => {
-        setError("Failed to load image");
-        setLoading(false);
+        if (retryCount < 3) {
+          setTimeout(() => fetchNewImage(categoryToFetch, retryCount + 1), 1000);
+        } else {
+          setError("Failed to load image");
+          setLoading(false);
+        }
       };
     } catch (err: any) {
-      setError(err.message);
-      setLoading(false);
+      if (retryCount < 3) {
+        setTimeout(() => fetchNewImage(categoryToFetch, retryCount + 1), 1000);
+      } else {
+        setError(err.message);
+        setLoading(false);
+      }
     }
   };
 
@@ -268,9 +276,9 @@ export default function BlindGamePage() {
           <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mt-4">{error}</p>
           <button
             onClick={() => fetchNewImage(selectedCategory)}
-            className="mt-6 px-8 py-4 bg-black text-white rounded-2xl font-bold tracking-wide dark:bg-white dark:text-black hover:scale-105 active:scale-95 transition-all shadow-xl"
+            className="mt-6 px-8 py-4 bg-black text-white rounded-2xl font-bold tracking-wide dark:bg-white dark:text-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-xl"
           >
-            Try Again
+            <RefreshCcw className="w-5 h-5" /> Retry
           </button>
         </div>
       ) : (

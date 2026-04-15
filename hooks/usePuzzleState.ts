@@ -52,6 +52,8 @@ export function usePuzzleState(isDaily: boolean = false) {
     setIsPlaying(true);
     setHasStartedMoving(false);
     setSelectedTileIndex(null);
+    setBlindState('idle');
+    setBlindCountdown(null);
   }, [size, isDaily, isBlindMode]);
 
   // Check for win

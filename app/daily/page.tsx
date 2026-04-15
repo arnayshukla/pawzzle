@@ -5,7 +5,7 @@ import { usePuzzleState } from "@/hooks/usePuzzleState";
 import { PuzzleBoard } from "@/components/PuzzleBoard";
 import { HUD } from "@/components/HUD";
 import { WinModal } from "@/components/WinModal";
-import { Loader2, ImageOff, ArrowLeft, Trophy, Share2, Check, Flame } from "lucide-react";
+import { Loader2, ImageOff, RefreshCcw, ArrowLeft, Trophy, Share2, Check, Flame } from "lucide-react";
 import Link from "next/link";
 import { AnimatePresence } from "framer-motion";
 import { Leaderboard } from "@/components/Leaderboard";
@@ -45,7 +45,7 @@ export default function DailyChallengePage() {
     if (cachedStreak) setStreak(parseInt(cachedStreak));
   }, []);
 
-  const fetchDailyImage = async () => {
+  const fetchDailyImage = async (retryCount = 0) => {
     setLoading(true);
     setError(null);
     puzzle.setIsPlaying(false);
@@ -79,12 +79,20 @@ export default function DailyChallengePage() {
         setLoading(false);
       };
       img.onerror = () => {
-        setError("Failed to load daily image");
-        setLoading(false);
+        if (retryCount < 3) {
+          setTimeout(() => fetchDailyImage(retryCount + 1), 1000);
+        } else {
+          setError("Failed to load daily image");
+          setLoading(false);
+        }
       };
     } catch (err: any) {
-      setError(err.message);
-      setLoading(false);
+      if (retryCount < 3) {
+        setTimeout(() => fetchDailyImage(retryCount + 1), 1000);
+      } else {
+        setError(err.message);
+        setLoading(false);
+      }
     }
   };
 
@@ -207,6 +215,12 @@ export default function DailyChallengePage() {
             <ImageOff className="w-10 h-10" />
           </div>
           <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mt-4">{error}</p>
+          <button
+            onClick={() => fetchDailyImage()}
+            className="mt-6 px-8 py-4 bg-black text-white rounded-2xl font-bold tracking-wide dark:bg-white dark:text-black flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-xl"
+          >
+            <RefreshCcw className="w-5 h-5" /> Retry
+          </button>
         </div>
       ) : hasPlayedToday && imageUrl && puzzle.order.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-6 text-center max-w-md mx-auto fade-in w-full">

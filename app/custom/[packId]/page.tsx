@@ -5,7 +5,7 @@ import { usePuzzleState } from "@/hooks/usePuzzleState";
 import { PuzzleBoard } from "@/components/PuzzleBoard";
 import { HUD } from "@/components/HUD";
 import { WinModal } from "@/components/WinModal";
-import { Loader2, ImageOff, ShieldAlert, Trophy } from "lucide-react";
+import { Loader2, ImageOff, RefreshCcw, ShieldAlert, Trophy } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -38,7 +38,7 @@ export default function CustomGamePage() {
 
   const puzzle = usePuzzleState();
 
-  const fetchNewImage = async () => {
+  const fetchNewImage = async (retryCount = 0) => {
     setLoading(true);
     setError(null);
     puzzle.setIsPlaying(false);
@@ -65,12 +65,20 @@ export default function CustomGamePage() {
         setLoading(false);
       };
       img.onerror = () => {
-        setError("Failed to load puzzle image.");
-        setLoading(false);
+        if (retryCount < 3) {
+          setTimeout(() => fetchNewImage(retryCount + 1), 1000);
+        } else {
+          setError("Failed to load puzzle image.");
+          setLoading(false);
+        }
       };
     } catch (err: any) {
-      setError(err.message);
-      setLoading(false);
+      if (retryCount < 3 && !isFlagged) {
+        setTimeout(() => fetchNewImage(retryCount + 1), 1000);
+      } else {
+        setError(err.message);
+        setLoading(false);
+      }
     }
   };
 
@@ -154,12 +162,20 @@ export default function CustomGamePage() {
           </div>
           <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mt-4 px-4">{error}</p>
           {!isFlagged && (
-            <Link
-              href="/"
-              className="mt-6 px-8 py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-bold tracking-wide transition-all shadow-xl"
-            >
-              Play Official Puzzles
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 mt-6">
+              <button
+                onClick={() => fetchNewImage()}
+                className="px-8 py-4 bg-black text-white dark:bg-white dark:text-black flex items-center justify-center gap-2 rounded-2xl font-bold tracking-wide transition-all shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <RefreshCcw className="w-5 h-5" /> Retry
+              </button>
+              <Link
+                href="/"
+                className="px-8 py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-bold tracking-wide flex items-center justify-center transition-all shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+              >
+                Play Official Puzzles
+              </Link>
+            </div>
           )}
         </div>
       ) : (
