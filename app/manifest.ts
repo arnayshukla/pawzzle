@@ -6,6 +6,8 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: 'Pawzzle',
     description: 'A daily sliding puzzle game featuring adorable dogs, global leaderboards, and categories.',
     start_url: '/',
+    id: '/',
+    scope: '/',
     display: 'standalone',
     background_color: '#000000',
     theme_color: '#000000',

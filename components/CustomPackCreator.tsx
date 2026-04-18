@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { Camera, UploadCloud, X, Check, Copy, Loader2 } from 'lucide-react';
+import { Camera, UploadCloud, X, Check, Copy, Loader2, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 
 export function CustomPackCreator() {
@@ -157,8 +157,9 @@ export function CustomPackCreator() {
 
         <Link 
           href={packLink.replace(window.location.origin, '')}
-          className="block w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-95"
+          className="flex items-center justify-center gap-2 w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-95 text-center"
         >
+          <PlayCircle className="w-5 h-5" />
           Play Your Puzzle Now
         </Link>
       </div>
