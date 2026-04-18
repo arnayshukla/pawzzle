@@ -312,6 +312,8 @@ export default function GamePage() {
             isPlaying={puzzle.isPlaying}
             hasStartedMoving={puzzle.hasStartedMoving}
             isSolved={puzzle.isSolved}
+            useHint={puzzle.useHint}
+            hintPenaltyAmount={puzzle.hintPenaltyAmount}
           />
           
           {imageUrl && puzzle.order.length > 0 && (

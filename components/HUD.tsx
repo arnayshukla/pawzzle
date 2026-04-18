@@ -45,7 +45,7 @@ export function HUD({ moves, time, difficulty, setDifficulty, onReset, onNewImag
 
       <div className="flex flex-wrap items-center gap-2">
         {/* Mechanics Container */}
-        {useHint && isBlindMode && !isDaily && (
+        {useHint && (
           <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 rounded-xl p-1 shadow-inner mr-2 sm:mr-4 transition-all">
             <button
               onClick={useHint}
